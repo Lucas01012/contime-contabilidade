@@ -1,0 +1,217 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|c:\\users\\lucas\\desktop\\projeto  contime\\onedrive_2024-09-15\\contime v2.0\\contime2.0\\contime\\screens\\bpat.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\bpat.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|c:\\users\\lucas\\desktop\\projeto  contime\\onedrive_2024-09-15\\contime v2.0\\contime2.0\\contime\\screens\\ldia.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\ldia.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\screens\\razo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\razo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|c:\\users\\lucas\\desktop\\projeto  contime\\onedrive_2024-09-15\\contime v2.0\\contime2.0\\contime\\screens\\dre.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\dre.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|c:\\users\\lucas\\desktop\\projeto  contime\\onedrive_2024-09-15\\contime v2.0\\contime2.0\\contime\\screens\\bal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\bal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|c:\\users\\lucas\\desktop\\projeto  contime\\onedrive_2024-09-15\\contime v2.0\\contime2.0\\contime\\screens\\bal.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\bal.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|c:\\users\\lucas\\desktop\\projeto  contime\\onedrive_2024-09-15\\contime v2.0\\contime2.0\\contime\\screens\\razo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\razo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|c:\\users\\lucas\\desktop\\projeto  contime\\onedrive_2024-09-15\\contime v2.0\\contime2.0\\contime\\classes\\ldia.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:classes\\ldia.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|c:\\users\\lucas\\desktop\\projeto  contime\\onedrive_2024-09-15\\contime v2.0\\contime2.0\\contime\\classes\\dre.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:classes\\dre.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|c:\\users\\lucas\\desktop\\projeto  contime\\onedrive_2024-09-15\\contime v2.0\\contime2.0\\contime\\classes\\razonetes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:classes\\razonetes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|c:\\users\\lucas\\desktop\\projeto  contime\\onedrive_2024-09-15\\contime v2.0\\contime2.0\\contime\\screens\\razo.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\razo.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|c:\\users\\lucas\\desktop\\projeto  contime\\onedrive_2024-09-15\\contime v2.0\\contime2.0\\contime\\screens\\razonete.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\razonete.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "BPat.cs",
+              "DocumentMoniker": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\Screens\\BPat.cs",
+              "RelativeDocumentMoniker": "Screens\\BPat.cs",
+              "ToolTip": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\Screens\\BPat.cs",
+              "RelativeToolTip": "Screens\\BPat.cs",
+              "ViewState": "AgIAAFMAAAAAAAAAAAAIwHEAAABRAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-15T17:42:25.622Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Dre.cs",
+              "DocumentMoniker": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\Screens\\Dre.cs",
+              "RelativeDocumentMoniker": "Screens\\Dre.cs",
+              "ToolTip": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\Screens\\Dre.cs",
+              "RelativeToolTip": "Screens\\Dre.cs",
+              "ViewState": "AQIAABsAAAAAAAAAAAA9wDsAAAAsAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-15T17:25:29.412Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Bal.cs",
+              "DocumentMoniker": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\Screens\\Bal.cs",
+              "RelativeDocumentMoniker": "Screens\\Bal.cs",
+              "ToolTip": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\Screens\\Bal.cs",
+              "RelativeToolTip": "Screens\\Bal.cs",
+              "ViewState": "AQIAAAcAAAAAAAAAAAAqwHQAAAARAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-15T17:05:12.555Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Bal.Designer.cs",
+              "DocumentMoniker": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\Screens\\Bal.Designer.cs",
+              "RelativeDocumentMoniker": "Screens\\Bal.Designer.cs",
+              "ToolTip": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\Screens\\Bal.Designer.cs",
+              "RelativeToolTip": "Screens\\Bal.Designer.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-15T17:05:09.873Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "Razonete.cs",
+              "DocumentMoniker": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\Screens\\Razonete.cs",
+              "RelativeDocumentMoniker": "Screens\\Razonete.cs",
+              "ToolTip": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\Screens\\Razonete.cs",
+              "RelativeToolTip": "Screens\\Razonete.cs",
+              "ViewState": "AQIAAFkAAAAAAAAAAAAIwGEAAAAJAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-15T17:02:44.85Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "LDia.cs",
+              "DocumentMoniker": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\Classes\\LDia.cs",
+              "RelativeDocumentMoniker": "Classes\\LDia.cs",
+              "ToolTip": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\Classes\\LDia.cs",
+              "RelativeToolTip": "Classes\\LDia.cs",
+              "ViewState": "AQIAAAwAAAAAAAAAAAAAAA0AAAATAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-15T17:01:05.357Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Razo.cs",
+              "DocumentMoniker": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\Screens\\Razo.cs",
+              "RelativeDocumentMoniker": "Screens\\Razo.cs",
+              "ToolTip": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\Screens\\Razo.cs",
+              "RelativeToolTip": "Screens\\Razo.cs",
+              "ViewState": "AQIAACIAAAAAAAAAAAAgwBIAAAAdAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-15T17:00:01.466Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "Razo.Designer.cs",
+              "DocumentMoniker": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\Screens\\Razo.Designer.cs",
+              "RelativeDocumentMoniker": "Screens\\Razo.Designer.cs",
+              "ToolTip": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\Screens\\Razo.Designer.cs",
+              "RelativeToolTip": "Screens\\Razo.Designer.cs",
+              "ViewState": "AQIAAA0AAAAAAAAAAAA1wAEAAAABAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-15T17:00:00.036Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Razonetes.cs",
+              "DocumentMoniker": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\Classes\\Razonetes.cs",
+              "RelativeDocumentMoniker": "Classes\\Razonetes.cs",
+              "ToolTip": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\Classes\\Razonetes.cs",
+              "RelativeToolTip": "Classes\\Razonetes.cs",
+              "ViewState": "AQIAAMoAAAAAAAAAAAAwwAoAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-15T16:58:24.84Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Dre.cs",
+              "DocumentMoniker": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\Classes\\Dre.cs",
+              "RelativeDocumentMoniker": "Classes\\Dre.cs",
+              "ToolTip": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\Classes\\Dre.cs",
+              "RelativeToolTip": "Classes\\Dre.cs",
+              "ViewState": "AQIAAC0AAAAAAAAAAAAowB8AAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-15T16:58:16.637Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "LDia.cs",
+              "DocumentMoniker": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\Screens\\LDia.cs",
+              "RelativeDocumentMoniker": "Screens\\LDia.cs",
+              "ToolTip": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\Screens\\LDia.cs",
+              "RelativeToolTip": "Screens\\LDia.cs",
+              "ViewState": "AQIAACkAAAAAAAAAAAAqwBMAAAAJAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-15T15:29:49.744Z"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Razo.cs [Projeto]",
+              "DocumentMoniker": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\Screens\\Razo.cs",
+              "RelativeDocumentMoniker": "Screens\\Razo.cs",
+              "ToolTip": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\Screens\\Razo.cs [Projeto]",
+              "RelativeToolTip": "Screens\\Razo.cs [Projeto]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-15T16:57:05.392Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
