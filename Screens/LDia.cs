@@ -61,61 +61,115 @@ namespace ConTime.Screens
             ldia.PdfCreate();
         }
 
+
+
         private void button1_Click(object sender, EventArgs e)
         {
-            string connectionString = "SERVER=localhost;DATABASE=bdcontime;UID=root;PASSWORD=projetocontime123;";
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            using (SaveFileDialog sfd = new SaveFileDialog())
             {
-                try
+                sfd.Filter = "CSV files (*.csv)|*.csv";
+                sfd.Title = "Salvar Livro Diário";
+                if (sfd.ShowDialog() == DialogResult.OK)
                 {
-                    connection.Open();
+                    SalvarLDia(sfd.FileName);
+                }
+            }
 
-                    foreach (DataGridViewRow row in dgv.Rows)
+        }
+
+        private void SalvarLDia(String filePath)
+        {
+
+            try
+            {
+                using (StreamWriter writer = new StreamWriter(filePath))
+                {
+                    writer.WriteLine("codigo,data,conta,historico,debito,credito");
+
+                    foreach (DataRow row in DS.Tables[tablename].Rows)
                     {
-                        if (row.Cells["codigo"].Value != null && row.Cells["data"].Value != null &&
-                            row.Cells["conta"].Value != null && row.Cells["historico"].Value != null &&
-                            row.Cells["debito"].Value != null && row.Cells["credito"].Value != null)
+                        string codigo = row["codigo"].ToString();
+                        string data = Convert.ToDateTime(row["data"]).ToString("dd/MM/yyyy");
+                        string conta = row["conta"].ToString();
+                        string historico = row["historico"].ToString();
+                        string debito = row["debito"] != DBNull.Value ? Convert.ToDecimal(row["debito"]).ToString("F2", CultureInfo.InvariantCulture) : "";
+                        string credito = row["credito"] != DBNull.Value ? Convert.ToDecimal(row["credito"]).ToString("F2", CultureInfo.InvariantCulture) : "";
+
+                        writer.WriteLine($"{codigo},{data},{conta},{historico},{debito},{credito}");
+                    }
+
+                    MessageBox.Show("Dados salvos com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao exportar o arquivo CSV: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+        }
+
+        private void btn_ImportarLdia_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog ofd = new OpenFileDialog())
+            {
+                ofd.Filter = "CSV files (*.csv)|*.csv";
+                ofd.Title = "Importar Livro Diário";
+                if (ofd.ShowDialog() == DialogResult.OK)
+                {
+                    ImportarLDia(ofd.FileName);
+                }
+            }
+        }
+
+        private void ImportarLDia(string filePath) {
+            try
+            {
+                using (StreamReader reader = new StreamReader(filePath))
+                {
+                    // Limpar o DataTable antes de importar novos dados
+                    DS.Tables[tablename].Clear();
+
+                    // Ignorar a primeira linha (Cabeçalho)
+                    string line = reader.ReadLine();
+
+                    // Ler cada linha do arquivo CSV
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        string[] data = line.Split(',');
+
+                        if (data.Length == 6) // Verifica se a linha tem o número correto de colunas
                         {
-                            MySqlCommand cmd = new MySqlCommand();
-                            cmd.Connection = connection;
-                            cmd.CommandText = "INSERT INTO livro_diario (codigo, data, conta, historico, debito, credito) VALUES (@codigo, @data, @conta, @historico, @debito, @credito)";
+                            DataRow row = DS.Tables[tablename].NewRow();
+                            row["codigo"] = data[0];
 
-                            string dataString = row.Cells["data"].Value.ToString();
-                            DateTime data;
-                            if (DateTime.TryParseExact(dataString, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out data))
-                            {
-                                cmd.Parameters.AddWithValue("@codigo", row.Cells["codigo"].Value);
-                                cmd.Parameters.AddWithValue("@data", data.ToString("yyyy-MM-dd"));
-                                cmd.Parameters.AddWithValue("@conta", row.Cells["conta"].Value);
-                                cmd.Parameters.AddWithValue("@historico", row.Cells["historico"].Value);
+                            // Formatação da data
+                            row["data"] = DateTime.ParseExact(data[1], "dd/MM/yyyy", CultureInfo.InvariantCulture);
 
-                                float debito = row.Cells["debito"].Value != DBNull.Value ? Convert.ToSingle(row.Cells["debito"].Value) : 0.0f;
-                                float credito = row.Cells["credito"].Value != DBNull.Value ? Convert.ToSingle(row.Cells["credito"].Value) : 0.0f;
+                            row["conta"] = data[2];
+                            row["historico"] = data[3];
 
-                                cmd.Parameters.AddWithValue("@debito", debito);
-                                cmd.Parameters.AddWithValue("@credito", credito);
+                            // Verifica se os campos de débito e crédito não estão vazios antes de converter
+                            row["debito"] = string.IsNullOrEmpty(data[4]) ? (object)DBNull.Value : Convert.ToDecimal(data[4], CultureInfo.InvariantCulture);
+                            row["credito"] = string.IsNullOrEmpty(data[5]) ? (object)DBNull.Value : Convert.ToDecimal(data[5], CultureInfo.InvariantCulture);
 
-                                cmd.ExecuteNonQuery();
-                            }
-                            else
-                            {
-                                MessageBox.Show($"Data inválida na linha {row.Index + 1}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            }
+                            // Adicionar a linha ao DataTable
+                            DS.Tables[tablename].Rows.Add(row);
+                        }
+                        else
+                        {
+                            MessageBox.Show($"Formato incorreto na linha: {line}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
 
-                    MessageBox.Show("Dados gravados com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Dados importados com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
-                catch (MySqlException ex)
-                {
-                    MessageBox.Show($"Erro ao gravar dados: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                catch (InvalidCastException ex)
-                {
-                    MessageBox.Show($"Erro de conversão de dados: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao importar o arquivo CSV: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }
 }
+
 

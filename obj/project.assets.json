@@ -1900,11 +1900,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\ConTime.csproj",
+      "projectUniqueName": "C:\\Users\\Lucas\\Source\\Repos\\contime-contabilidade\\ConTime.csproj",
       "projectName": "ConTime",
-      "projectPath": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\ConTime.csproj",
+      "projectPath": "C:\\Users\\Lucas\\Source\\Repos\\contime-contabilidade\\ConTime.csproj",
       "packagesPath": "C:\\Users\\Lucas\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Lucas\\Desktop\\Projeto  Contime\\OneDrive_2024-09-15\\ConTime v2.0\\ConTime2.0\\ConTime\\obj\\",
+      "outputPath": "C:\\Users\\Lucas\\Source\\Repos\\contime-contabilidade\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

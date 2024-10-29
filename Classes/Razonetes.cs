@@ -131,6 +131,8 @@ namespace ConTime.Classes
         public List<RazoRegistro> registros = new();
         internal float totalD;
         internal float totalC;
+        private DataSet ds;
+        private TextBox header;
         #region Pdf
         public void CreateHeader(IContainer container)
         {
@@ -203,6 +205,12 @@ namespace ConTime.Classes
                 float.TryParse(Convert.ToString(totais["Total_Credito"]), out this.totalC);
             }
 
+        }
+
+        public Razo(DataSet ds, TextBox header)
+        {
+            this.ds = ds;
+            this.header = header;
         }
 
         public class RazoRegistro

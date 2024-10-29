@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using ConTime.Classes;
 using MySql.Data.MySqlClient;
+using System.Xml.Linq;
 
 namespace ConTime.Screens
 {
@@ -23,15 +24,19 @@ namespace ConTime.Screens
         float TAtivos = 0;
         float[] Passivos = new float[3];
         float TPassivos = 0;
+
         public BPat()
         {
             InitializeComponent();
+            InitializeDataSet();
 
-            TablesInterface = [
+            TablesInterface = new DataGridView[]
+            {
                 AtvCirculante, AtvNCirculante, PsvCirculante, PsvNCirculante, Patrimonio
-            ];
-            TablesAtivos = [AtvCirculante, AtvNCirculante];
-            TablesPassivos = [PsvCirculante, PsvNCirculante, Patrimonio];
+            };
+            TablesAtivos = new DataGridView[] { AtvCirculante, AtvNCirculante };
+            TablesPassivos = new DataGridView[] { PsvCirculante, PsvNCirculante, Patrimonio };
+
             foreach (KeyValuePair<short, string> table in BPRegistro.rkey)
             {
                 TableSetup(table.Value);
@@ -39,15 +44,31 @@ namespace ConTime.Screens
 
                 TablesInterface[table.Key].Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                 TablesInterface[table.Key].Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+
+                TablesInterface[table.Key].AllowUserToAddRows = true;
             }
         }
 
+        private void InitializeDataSet()
+        {
+            foreach (KeyValuePair<short, string> table in BPRegistro.rkey)
+            {
+                TableSetup(table.Value);
+            }
+        }
 
         private void TableSetup(string name)
         {
-            DataTable dt = ds.Tables.Add(name);
-            dt.Columns.Add("Conta");
-            dt.Columns.Add("Saldo");
+            if (!ds.Tables.Contains(name))
+            {
+                DataTable dt = ds.Tables.Add(name);
+                dt.Columns.Add("Conta");
+                dt.Columns.Add("Saldo");
+            }
+            else
+            {
+                ds.Tables[name].Rows.Clear();
+            }
         }
 
         private void PdfCreate(object sender, EventArgs e)
@@ -63,114 +84,225 @@ namespace ConTime.Screens
             if (Array.IndexOf(TablesAtivos, dgv) != -1)
             {
                 int index = Array.IndexOf(TablesAtivos, dgv);
-                float result = 0;
-                foreach (DataGridViewRow dr in dgv.Rows)
-                {
-                    float r = 0;
-                    float.TryParse(Convert.ToString(dr.Cells["Saldo"].Value), out r);
-                    result += r;
-                }
-                Ativos[index] = result;
-                TAtivos = 0;
-                foreach (float a in Ativos)
-                    TAtivos += a;
-                lbl_TAtivos.Text = $"{TAtivos:C}";
+                Ativos[index] = CalcularTotalSaldo(dgv);
+                AtualizarTotalAtivos();
             }
             else if (Array.IndexOf(TablesPassivos, dgv) != -1)
             {
                 int index = Array.IndexOf(TablesPassivos, dgv);
-                float result = 0;
-                foreach (DataGridViewRow dr in dgv.Rows)
+                Passivos[index] = CalcularTotalSaldo(dgv);
+                AtualizarTotalPassivos();
+            }
+        }
+
+        private float CalcularTotalSaldo(DataGridView dgv)
+        {
+            float result = 0;
+            foreach (DataGridViewRow dr in dgv.Rows)
+            {
+                if (!dr.IsNewRow)
                 {
-                    float r;
-                    float.TryParse(Convert.ToString(dr.Cells["Saldo"].Value), out r);
+                    float.TryParse(Convert.ToString(dr.Cells["Saldo"].Value), out float r);
                     result += r;
                 }
-                Passivos[index] = result;
-                TPassivos = 0;
-                foreach (float a in Passivos)
-                    TPassivos += a;
-                lbl_TPassivos.Text = $"{TPassivos:C}";
             }
+            return result;
+        }
+
+        private void AtualizarTotalAtivos()
+        {
+            TAtivos = Ativos.Sum();
+            lbl_TAtivos.Text = $"{TAtivos:C}";
+        }
+
+        private void AtualizarTotalPassivos()
+        {
+            TPassivos = Passivos.Sum();
+            lbl_TPassivos.Text = $"{TPassivos:C}";
         }
 
         private void btn_salvar_bpat_Click(object sender, EventArgs e)
         {
-            string connectionString = "SERVER=localhost;DATABASE=bdcontime;UID=root;PASSWORD=projetocontime123;";
+            SalvarBalanco();
+        }
+
+
+        private void SalvarBalanco()
+        {
             string cabecario = tb_Header.Text;
-            try
+
+            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
             {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                saveFileDialog.Filter = "Arquivo CSV (*.csv)|*.csv";
+                saveFileDialog.Title = "Salvar Balanço Patrimonial";
+                saveFileDialog.DefaultExt = "csv";
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    connection.Open();
+                    string caminhoArquivo = saveFileDialog.FileName;
 
-                    string query = "INSERT INTO balanco_patrimonial (cabecario, total_ativo, total_passivo) VALUES (@Cabecario, @TAtivos, @TPassivos)";
-
-                    using (MySqlCommand command = new MySqlCommand(query, connection))
+                    try
                     {
-                        
-                        command.Parameters.AddWithValue("@Cabecario",cabecario);
-                        command.Parameters.AddWithValue("@TAtivos", TAtivos);
-                        command.Parameters.AddWithValue("@TPassivos", TPassivos);
+                        using (StreamWriter sw = new StreamWriter(caminhoArquivo))
+                        {
+                            sw.WriteLine(cabecario);
 
-                        command.ExecuteNonQuery();
+                            SalvarDadosDataGridView(sw, "Ativos Circulantes", AtvCirculante);
+                            SalvarDadosDataGridView(sw, "Ativos Não Circulantes", AtvNCirculante);
+                            SalvarDadosDataGridView(sw, "Passivos Circulantes", PsvCirculante);
+                            SalvarDadosDataGridView(sw, "Passivos Não Circulantes", PsvNCirculante);
+                            SalvarDadosDataGridView(sw, "Patrimônio Líquido", Patrimonio);
 
-                        MessageBox.Show("Valores do Balanço Patrimonial salvos com sucesso!");
+                            sw.WriteLine();
+                            sw.WriteLine($"TotalAtivo,{TAtivos}");
+                            sw.WriteLine($"TotalPassivo,{TPassivos}");
+                        }
+                        MessageBox.Show("Balanço Patrimonial salvo com sucesso no arquivo CSV!");
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Erro ao salvar o Balanço Patrimonial no arquivo: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
-            catch (MySqlException ex)
+        }
+
+
+
+        private void SalvarDadosDataGridView(StreamWriter sw, string nomeCategoria, DataGridView dgv)
+        {
+            sw.WriteLine(nomeCategoria);
+            sw.WriteLine("Conta,Saldo");
+            foreach (DataGridViewRow row in dgv.Rows)
             {
-                MessageBox.Show($"Erro ao salvar os valores do Balanço Patrimonial no banco de dados: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                if (!row.IsNewRow && row.Cells[0].Value != null && row.Cells[1].Value != null)
+                {
+                    string conta = row.Cells[0].Value?.ToString() ?? string.Empty;
+                    string saldo = row.Cells[1].Value?.ToString() ?? "0";
+                    sw.WriteLine($"{conta},{saldo}");
+                }
             }
-            catch (Exception ex)
+            sw.WriteLine();
+        }
+
+
+        private void btn_ImpBpat_Click(object sender, EventArgs e)
+        {
+            ImportarBalanco();
+        }
+
+        private void LimparTabelas()
+        {
+            LimparTabela("AtvCirculante");
+            LimparTabela("AtvNCirculante");
+            LimparTabela("PsvCirculante");
+            LimparTabela("PsvNCirculante");
+            LimparTabela("Patrimonio");
+        }
+
+        private void LimparTabela(string nomeTabela)
+        {
+            if (ds.Tables.Contains(nomeTabela))
             {
-                MessageBox.Show($"Ocorreu um erro: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ds.Tables[nomeTabela].Rows.Clear();
             }
+        }
+
+        private void ImportarBalanco()
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Arquivo CSV (*.csv)|*.csv";
+                openFileDialog.Title = "Importar Balanço Patrimonial";
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string caminhoArquivo = openFileDialog.FileName;
+                    StreamReader sr = null;
+
+                    try
+                    {
+                        sr = new StreamReader(caminhoArquivo);
+                        tb_Header.Text = sr.ReadLine();
+
+                        LimparTabelas();
+
+                        LerDadosDataTable(sr, ds.Tables["AtvCirculante"], "Ativos Circulantes");
+                        LerDadosDataTable(sr, ds.Tables["AtvNCirculante"], "Ativos Não Circulantes");
+                        LerDadosDataTable(sr, ds.Tables["PsvCirculante"], "Passivos Circulantes");
+                        LerDadosDataTable(sr, ds.Tables["PsvNCirculante"], "Passivos Não Circulantes");
+                        LerDadosDataTable(sr, ds.Tables["Patrimonio"], "Patrimônio Líquido");
+
+                        TAtivos = LerTotal(sr, "TotalAtivo");
+                        TPassivos = LerTotal(sr, "TotalPassivo");
+
+                        lbl_TAtivos.Text = $"{TAtivos:C}";
+                        lbl_TPassivos.Text = $"{TPassivos:C}";
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Erro ao importar o Balanço Patrimonial: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    finally
+                    {
+                        if (sr != null) sr.Close();
+                    }
+                }
+            }
+        }
+
+
+
+        private float LerTotal(StreamReader sr, string nomeTotal)
+        {
+            string linha;
+            while ((linha = sr.ReadLine()) != null)
+            {
+                if (linha.StartsWith(nomeTotal))
+                {
+                    string[] partes = linha.Split(',');
+                    if (partes.Length == 2 && float.TryParse(partes[1], out float valor))
+                    {
+                        return valor;
+                    }
+                }
+            }
+            return 0;
+        }
+
+
+        private void LerDadosDataTable(StreamReader sr, DataTable dt, string nomeCategoria)
+        {
+            if (dt == null)
+            {
+                throw new ArgumentNullException(nameof(dt), "A DataTable não pode ser nula.");
+            }
+
+            string linha;
+            while ((linha = sr.ReadLine()) != null)
+            {
+                if (linha == nomeCategoria) break;
+            }
+
+            sr.ReadLine();
+
+            while ((linha = sr.ReadLine()) != null)
+            {
+                if (linha.Trim().Length == 0) break;
+                string[] partes = linha.Split(',');
+                if (partes.Length >= 2)
+                {
+                    DataRow row = dt.NewRow();
+                    row["Conta"] = partes[0];
+                    row["Saldo"] = partes[1];
+                    dt.Rows.Add(row);
+                }
+            }
+        }
+
+        private void AtvCirculante_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
     }
 }
-        /*private void test(object sender, EventArgs e)
-        {
-            DataTable dt = new();
-            dt.Columns.Add("id");
-            dt.Columns.Add("total_ativo");
-            dt.Columns.Add("total_passivo");
-            DataRow dr = dt.NewRow();
-            dr["id"] = 1;
-            dr["total_ativo"] = 50000;
-            dr["total_passivo"] = 50000;
-
-            DataTable rotulos = new DataTable();
-            rotulos.Columns.Add("id");
-            rotulos.Columns.Add("bp_id");
-            rotulos.Columns.Add("rkey");
-            rotulos.Columns.Add("conta");
-            rotulos.Columns.Add("saldo");
-
-            int j = 0;
-            for (int i = 0; i < TablesInterface.Length; i++)
-            {
-                DataGridView dgv = TablesInterface[i];
-                foreach(DataGridViewRow row in dgv.Rows)
-                {
-                    if(!row.IsNewRow)
-                    {
-                        DataRow rotulo = rotulos.NewRow();
-                        rotulo["id"] = j;
-                        rotulo["bp_id"] = 1;
-                        rotulo["rkey"] = i;
-                        foreach (DataGridViewColumn column in dgv.Columns)
-                        {
-                            rotulo[column.Name.ToLower()] = row.Cells[column.Index].Value;
-                        }
-                        rotulos.Rows.Add(rotulo);
-                        j++;
-                    }
-                    
-                }
-            }
-            balanco = new Classes.BPat(dr, rotulos);
-        }*/
-    
-
