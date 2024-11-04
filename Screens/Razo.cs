@@ -15,12 +15,12 @@ namespace ConTime.Screens
 {
     public partial class Razo : UserControl
     {
-        private DataSet ds = new DataSet();
+        public DataSet ds = new DataSet();
         private Razonete _parentRazonete;
         public static string tablename = "Razo";
         public static string linhasname = "Razo_Linhas";
 
-        private TextBox txtHeader;
+        public TextBox txtHeader;
         private Panel panelRazonetes;
         private Button btnAddRazo;
         private Razonete razonete;
@@ -52,6 +52,9 @@ namespace ConTime.Screens
             this.Controls.Add(txtHeader);
         }
 
+        public String GetCabecalho() { 
+            return txtHeader.Text;
+        }
         private void InitializePanel()
         {
             panelRazonetes = new Panel
@@ -87,8 +90,8 @@ namespace ConTime.Screens
 
             foreach (DataRow row in ds.Tables[linhasname].Rows)
             {
-                float debito = row.Field<float>("Debito");
-                float credito = row.Field<float>("Credito");
+                decimal debito = row.Field<decimal>("Debito");
+                decimal credito = row.Field<decimal>("Credito");
 
                 Razo novoRazo = new Razo("Razonete: " + (panelRazonetes.Controls.Count + 1));
                 novoRazo.Dock = DockStyle.Top;
@@ -105,8 +108,8 @@ namespace ConTime.Screens
         public void InitializeDataTables()
         {
             DataTable dl = ds.Tables.Add(linhasname);
-            dl.Columns.Add("Debito", typeof(float));
-            dl.Columns.Add("Credito", typeof(float));
+            dl.Columns.Add("Debito", typeof(decimal));
+            dl.Columns.Add("Credito", typeof(decimal));
             dataGridView1.DataSource = dl;
 
             foreach (DataGridViewColumn column in dataGridView1.Columns)
@@ -115,8 +118,8 @@ namespace ConTime.Screens
             }
 
             DataTable dt = ds.Tables.Add(tablename);
-            dt.Columns.Add("Total_Debito", typeof(float));
-            dt.Columns.Add("Total_Credito", typeof(float));
+            dt.Columns.Add("Total_Debito", typeof(decimal));
+            dt.Columns.Add("Total_Credito", typeof(decimal));
 
             DataRow initialRow = dt.NewRow();
             initialRow["Total_Debito"] = 0;
@@ -133,15 +136,50 @@ namespace ConTime.Screens
 
         public void InicializaRegistros()
         {
-            AddRegistro(0.0f, 0.0f);
+
+        }
+        private void dataGridView1_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+        {
+            if (dataGridView1.CurrentCell.ColumnIndex == dataGridView1.Columns["Debito"].Index ||
+                dataGridView1.CurrentCell.ColumnIndex == dataGridView1.Columns["Credito"].Index)
+            {
+                var textBox = e.Control as TextBox;
+
+                if (textBox != null)
+                {
+                    textBox.KeyPress -= TextBox_KeyPress; 
+                    textBox.KeyPress += TextBox_KeyPress; 
+                }
+            }
         }
 
+        private void TextBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && e.KeyChar != ',')
+            {
+                e.Handled = true; 
+            }
+        }
         private void dataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
+            if (dataGridView1.Columns[e.ColumnIndex].Name == "Debito" || dataGridView1.Columns[e.ColumnIndex].Name == "Credito")
+            {
+                if (dataGridView1[e.ColumnIndex, e.RowIndex].Value is string value)
+                {
+                    if (decimal.TryParse(value.Replace(',', '.'), out decimal result))
+                    {
+                        dataGridView1[e.ColumnIndex, e.RowIndex].Value = result;
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Valor inválido: {value}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
             CalcularTotais();
         }
 
-        private void CalcularTotais()
+        public void CalcularTotais()
         {
             float totalDebito = 0, totalCredito = 0;
 
@@ -173,80 +211,21 @@ namespace ConTime.Screens
             return new Classes.Razo(ds, txtHeader.Text);
         }
 
-        public void AddRegistro(float debito, float credito)
+        public void SetCabecalho(string cabecalho)
+        {
+            txtHeader.Text = cabecalho;
+        }
+
+        public void AddRegistro(decimal debito, decimal credito)
         {
             DataRow newRow = ds.Tables[linhasname].NewRow();
             newRow["Debito"] = debito;
             newRow["Credito"] = credito;
+
             ds.Tables[linhasname].Rows.Add(newRow);
 
+            dataGridView1.DataSource = null; 
             dataGridView1.DataSource = ds.Tables[linhasname];
-        }
-
-        public bool HasRecords()
-        {
-            return ds.Tables.Contains(linhasname) && ds.Tables[linhasname].Rows.Count > 0;
-        }
-
-        public void ImportarRegistros(string caminhoDoArquivo)
-        {
-            using (var reader = new StreamReader(caminhoDoArquivo))
-            {
-                string linha;
-                bool isHeader = true;
-
-                while ((linha = reader.ReadLine()) != null)
-                {
-                    if (isHeader && linha.StartsWith("Cabeçalho:"))
-                    {
-                        txtHeader.Text = linha.Substring("Cabeçalho:".Length).Trim();
-                        isHeader = false;
-                        continue;
-                    }
-
-                    if (linha.StartsWith("Débito,Crédito"))
-                    {
-                        continue;
-                    }
-
-                    var valores = linha.Split(',');
-                    if (valores.Length >= 2 &&
-                        float.TryParse(valores[0], out float debito) &&
-                        float.TryParse(valores[1], out float credito))
-                    {
-                        AddRegistro(debito, credito);
-                    }
-                    else if (linha.StartsWith("Total Débito:") || linha.StartsWith("Total Crédito:"))
-                    {
-
-                        continue;
-                    }
-                }
-            }
-        }
-
-        private float ExtractValue(string linha)
-        {
-            var partes = linha.Split(':');
-            return float.TryParse(partes[1].Trim(), out float valor) ? valor : 0f;
-        }
-
-        public void AdicionarTotalDebito(float totalDebito)
-        {
-            if (ds.Tables.Contains(tablename))
-            {
-                DataRow resultadoRow = ds.Tables[tablename].Rows[0];
-                resultadoRow["Total_Debito"] = totalDebito;
-            }
-        }
-
-        public void AdicionarTotalCredito(float totalCredito)
-        {
-            if (ds.Tables.Contains(tablename))
-            {
-                DataRow resultadoRow = ds.Tables[tablename].Rows[0];
-                resultadoRow["Total_Credito"] = totalCredito;
-            }
         }
 
 

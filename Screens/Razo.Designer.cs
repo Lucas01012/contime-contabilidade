@@ -32,8 +32,8 @@
             dgv_result = new DataGridView();
             Header = new TextBox();
             panel1 = new RoundedPanel();
-            dataGridView1 = new DataGridView();
             button1 = new Button();
+            dataGridView1 = new DataGridView();
             ((System.ComponentModel.ISupportInitialize)dgv_result).BeginInit();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
@@ -91,6 +91,16 @@
             panel1.Size = new Size(192, 234);
             panel1.TabIndex = 2;
             // 
+            // button1
+            // 
+            button1.Location = new Point(163, 0);
+            button1.Name = "button1";
+            button1.Size = new Size(26, 21);
+            button1.TabIndex = 4;
+            button1.Text = "X";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
+            // 
             // dataGridView1
             // 
             dataGridView1.AllowUserToResizeColumns = false;
@@ -121,16 +131,6 @@
             dataGridView1.TabIndex = 0;
             dataGridView1.CellEndEdit += dataGridView1_CellEndEdit;
             dataGridView1.SelectionChanged += dataGridView1_SelectionChanged;
-            // 
-            // button1
-            // 
-            button1.Location = new Point(163, 0);
-            button1.Name = "button1";
-            button1.Size = new Size(26, 21);
-            button1.TabIndex = 4;
-            button1.Text = "X";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
             // 
             // Razo
             // 
