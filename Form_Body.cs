@@ -253,5 +253,15 @@ namespace ConTime
         {
 
         }
+
+        private void img_logo_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void img_logo_Click_1(object sender, EventArgs e)
+        {
+
+        }
     }
 }

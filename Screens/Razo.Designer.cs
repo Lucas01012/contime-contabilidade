@@ -28,12 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             dgv_result = new DataGridView();
-            Header = new TextBox();
             panel1 = new RoundedPanel();
             button1 = new Button();
             dataGridView1 = new DataGridView();
+            Header = new TextBox();
             ((System.ComponentModel.ISupportInitialize)dgv_result).BeginInit();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
@@ -41,40 +41,28 @@
             // 
             // dgv_result
             // 
+            dgv_result.AllowUserToDeleteRows = false;
             dgv_result.AllowUserToResizeColumns = false;
             dgv_result.AllowUserToResizeRows = false;
             dgv_result.BackgroundColor = Color.White;
             dgv_result.BorderStyle = BorderStyle.None;
             dgv_result.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgv_result.ColumnHeadersVisible = false;
-            dgv_result.Dock = DockStyle.Bottom;
             dgv_result.EditMode = DataGridViewEditMode.EditOnEnter;
             dgv_result.GridColor = Color.DarkGreen;
-            dgv_result.Location = new Point(0, 212);
+            dgv_result.Location = new Point(0, 210);
             dgv_result.MultiSelect = false;
             dgv_result.Name = "dgv_result";
-            dgv_result.ReadOnly = true;
             dgv_result.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
             dgv_result.RowHeadersVisible = false;
             dgv_result.RowHeadersWidth = 25;
             dgv_result.RowTemplate.Height = 24;
             dgv_result.ScrollBars = ScrollBars.Vertical;
             dgv_result.SelectionMode = DataGridViewSelectionMode.CellSelect;
-            dgv_result.Size = new Size(192, 22);
+            dgv_result.Size = new Size(201, 60);
             dgv_result.TabIndex = 1;
+            dgv_result.CellContentClick += dgv_result_CellContentClick;
             dgv_result.SelectionChanged += dataGridView1_SelectionChanged;
-            // 
-            // Header
-            // 
-            Header.BorderStyle = BorderStyle.None;
-            Header.Dock = DockStyle.Top;
-            Header.Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            Header.Location = new Point(0, 0);
-            Header.Name = "Header";
-            Header.PlaceholderText = "Cabeçalho";
-            Header.Size = new Size(192, 19);
-            Header.TabIndex = 3;
-            Header.TextAlign = HorizontalAlignment.Center;
             // 
             // panel1
             // 
@@ -93,9 +81,9 @@
             // 
             // button1
             // 
-            button1.Location = new Point(163, 0);
+            button1.Location = new Point(172, 0);
             button1.Name = "button1";
-            button1.Size = new Size(26, 21);
+            button1.Size = new Size(20, 22);
             button1.TabIndex = 4;
             button1.Text = "X";
             button1.UseVisualStyleBackColor = true;
@@ -105,32 +93,46 @@
             // 
             dataGridView1.AllowUserToResizeColumns = false;
             dataGridView1.AllowUserToResizeRows = false;
+            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dataGridView1.BackgroundColor = Color.White;
             dataGridView1.BorderStyle = BorderStyle.None;
-            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle1.BackColor = SystemColors.Control;
-            dataGridViewCellStyle1.Font = new Font("Microsoft Sans Serif", 7.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
-            dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle2.BackColor = SystemColors.Control;
+            dataGridViewCellStyle2.Font = new Font("Microsoft Sans Serif", 7.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
+            dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Dock = DockStyle.Fill;
             dataGridView1.EditMode = DataGridViewEditMode.EditOnEnter;
             dataGridView1.GridColor = Color.DarkGreen;
-            dataGridView1.Location = new Point(0, 19);
+            dataGridView1.Location = new Point(-6, 20);
             dataGridView1.MultiSelect = false;
             dataGridView1.Name = "dataGridView1";
+            dataGridView1.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
             dataGridView1.RowHeadersVisible = false;
-            dataGridView1.RowHeadersWidth = 25;
+            dataGridView1.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
             dataGridView1.RowTemplate.Height = 24;
             dataGridView1.ScrollBars = ScrollBars.Vertical;
             dataGridView1.SelectionMode = DataGridViewSelectionMode.CellSelect;
-            dataGridView1.Size = new Size(192, 215);
+            dataGridView1.Size = new Size(207, 211);
             dataGridView1.TabIndex = 0;
+            dataGridView1.CellContentClick += dataGridView1_CellContentClick;
             dataGridView1.CellEndEdit += dataGridView1_CellEndEdit;
             dataGridView1.SelectionChanged += dataGridView1_SelectionChanged;
+            // 
+            // Header
+            // 
+            Header.BorderStyle = BorderStyle.None;
+            Header.Dock = DockStyle.Top;
+            Header.Font = new Font("Yu Gothic UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            Header.Location = new Point(0, 0);
+            Header.Name = "Header";
+            Header.PlaceholderText = "Cabeçalho";
+            Header.Size = new Size(192, 22);
+            Header.TabIndex = 3;
+            Header.TextAlign = HorizontalAlignment.Center;
             // 
             // Razo
             // 
@@ -151,9 +153,9 @@
         #endregion
 
         private System.Windows.Forms.DataGridView dgv_result;
-        private System.Windows.Forms.TextBox Header;
         private RoundedPanel panel1;
-        private System.Windows.Forms.DataGridView dataGridView1;
         private Button button1;
+        private DataGridView dataGridView1;
+        private TextBox Header;
     }
 }

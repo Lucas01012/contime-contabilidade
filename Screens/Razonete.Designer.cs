@@ -55,7 +55,7 @@
             // 
             // btn_addUC
             // 
-            btn_addUC.BackColor = Color.Transparent;
+            btn_addUC.BackColor = Color.FromArgb(185, 220, 201);
             btn_addUC.Dock = DockStyle.Fill;
             btn_addUC.FlatAppearance.BorderSize = 0;
             btn_addUC.FlatStyle = FlatStyle.Flat;
@@ -74,19 +74,23 @@
             // 
             // btn_salvar_razo
             // 
-            btn_salvar_razo.Location = new Point(677, 0);
+            btn_salvar_razo.BackColor = Color.FromArgb(185, 220, 201);
+            btn_salvar_razo.Font = new Font("Yu Gothic UI", 9F, FontStyle.Bold);
+            btn_salvar_razo.Location = new Point(3, 14);
             btn_salvar_razo.Name = "btn_salvar_razo";
             btn_salvar_razo.Size = new Size(59, 34);
             btn_salvar_razo.TabIndex = 3;
             btn_salvar_razo.Text = "Salvar";
-            btn_salvar_razo.UseVisualStyleBackColor = true;
+            btn_salvar_razo.UseVisualStyleBackColor = false;
             btn_salvar_razo.Click += btn_salvar_razo_Click;
             // 
             // roundedButton1
             // 
+            roundedButton1.BackColor = Color.FromArgb(185, 220, 201);
             roundedButton1.FlatAppearance.BorderSize = 0;
             roundedButton1.FlatStyle = FlatStyle.Flat;
-            roundedButton1.Location = new Point(756, 0);
+            roundedButton1.Font = new Font("Yu Gothic UI", 9F, FontStyle.Bold);
+            roundedButton1.Location = new Point(138, 13);
             roundedButton1.Margin = new Padding(3, 2, 3, 2);
             roundedButton1.Name = "roundedButton1";
             roundedButton1.RoundedBorderColor = Color.DarkGreen;
@@ -95,11 +99,12 @@
             roundedButton1.Size = new Size(39, 34);
             roundedButton1.TabIndex = 0;
             roundedButton1.Text = "PDF";
-            roundedButton1.UseVisualStyleBackColor = true;
+            roundedButton1.UseVisualStyleBackColor = false;
             roundedButton1.Click += CreatePdf;
             // 
             // pnl_razonetes
             // 
+            pnl_razonetes.BackColor = Color.FromArgb(96, 128, 111);
             pnl_razonetes.Controls.Add(pnl_razo);
             pnl_razonetes.Dock = DockStyle.Fill;
             pnl_razonetes.Location = new Point(0, 51);
@@ -107,9 +112,11 @@
             pnl_razonetes.Name = "pnl_razonetes";
             pnl_razonetes.Size = new Size(839, 475);
             pnl_razonetes.TabIndex = 2;
+            pnl_razonetes.Paint += pnl_razonetes_Paint;
             // 
             // panel1
             // 
+            panel1.BackColor = Color.FromArgb(29, 61, 48);
             panel1.Controls.Add(btn_ImportarRazo);
             panel1.Controls.Add(btn_salvar_razo);
             panel1.Controls.Add(roundedButton1);
@@ -122,12 +129,14 @@
             // 
             // btn_ImportarRazo
             // 
-            btn_ImportarRazo.Location = new Point(607, 0);
+            btn_ImportarRazo.BackColor = Color.FromArgb(185, 220, 201);
+            btn_ImportarRazo.Font = new Font("Yu Gothic UI", 9F, FontStyle.Bold);
+            btn_ImportarRazo.Location = new Point(68, 14);
             btn_ImportarRazo.Name = "btn_ImportarRazo";
             btn_ImportarRazo.Size = new Size(64, 34);
             btn_ImportarRazo.TabIndex = 4;
             btn_ImportarRazo.Text = "Importar";
-            btn_ImportarRazo.UseVisualStyleBackColor = true;
+            btn_ImportarRazo.UseVisualStyleBackColor = false;
             btn_ImportarRazo.Click += btn_ImportarRazo_Click;
             // 
             // Razonete
@@ -139,7 +148,6 @@
             Margin = new Padding(3, 2, 3, 2);
             Name = "Razonete";
             Size = new Size(839, 526);
-           // SizeChanged += Razonete_SizeChanged;
             pnl_razo.ResumeLayout(false);
             pnl_razonetes.ResumeLayout(false);
             panel1.ResumeLayout(false);

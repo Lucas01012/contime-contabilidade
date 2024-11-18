@@ -26,6 +26,8 @@ namespace ConTime.Screens
             this.HorizontalScroll.Maximum = 0;
             this.AutoScroll = false;
             this.VerticalScroll.Visible = false;
+            pnl_razonetes.AutoScroll = true;
+            pnl_razonetes.VerticalScroll.Visible = true;
         }
 
         private void AddScreen(UserControl uc, Panel pnl)
@@ -42,6 +44,7 @@ namespace ConTime.Screens
         {
             _currentRazo = razo ?? throw new ArgumentNullException(nameof(razo));
         }
+
 
         public void btn_addUC_Click(object sender, EventArgs e)
         {
@@ -69,21 +72,33 @@ namespace ConTime.Screens
             AddScreen(uc, pnl);
             SetCurrentRazo(uc);
             RepositionPanels();
+
+            // Posiciona o botão de adicionar à direita do último Razonete
+            btn_addUC.Left = pnl.Left + pnl.Width + 10; // Ajuste a distância conforme necessário
+            btn_addUC.Top = pnl.Top; // Alinha o botão com o Razonete em Y
+            this.pnl_razonetes.AutoScroll = true;
         }
+
+
         public void RepositionPanels()
         {
             int uc_width = this.Width;
-            int uc_height = this.Height;
             int childMaxW = uc_width / pnl_razo.Width;
-            int padW = uc_width % pnl_razo.Width / childMaxW;
-            int y = 0; 
+            int padW = (uc_width % pnl_razo.Width) / Math.Max(childMaxW, 1); // Proteção contra divisão por zero
+            int y = 0;
 
             foreach (Control control in this.pnl_razonetes.Controls)
             {
+                // Ignorar o botão de adicionar, para que ele não seja reposicionado
+                if (control is System.Windows.Forms.Button)
+                {
+                    continue; // Pula o botão de adicionar
+                }
+
                 if (control is RoundedPanel panel)
                 {
-                    panel.Left = 2 + ((panel.Width + padW) * (y % (uc_width / (panel.Width + padW))));
-                    panel.Top = 2 + ((panel.Height + 5) * (y / (uc_width / (panel.Width + padW))));
+                    panel.Left = 2 + ((panel.Width + padW) * (y % childMaxW));
+                    panel.Top = 2 + ((panel.Height + 5) * (y / childMaxW));
                     y++;
                 }
             }
@@ -114,7 +129,7 @@ namespace ConTime.Screens
             {
                 parentPanel.Controls.Remove(panel);
                 panel.Dispose();
-                parentPanel.BackColor = Color.FromArgb(185, 220, 200);
+                parentPanel.BackColor = Color.FromArgb(96, 128, 111);
 
                 RepositionPanels();
             }
@@ -149,6 +164,9 @@ namespace ConTime.Screens
             }
             razonete.PdfCreate();
         }
+
+
+
         private void SalvarRazos(string filePath)
         {
             try
@@ -165,29 +183,37 @@ namespace ConTime.Screens
                     {
                         string cabecalho = razo.GetCabecalho();
 
-                        if (string.IsNullOrWhiteSpace(cabecalho))
+                        // Verifica se o cabeçalho é vazio ou igual ao valor padrão
+                        if (string.IsNullOrWhiteSpace(cabecalho) || cabecalho == "Cabeçalho Padrão")
                         {
-                            cabecalho = "Cabeçalho Padrão"; 
+                            continue; // Ignorar razo com cabeçalho padrão ou vazio
                         }
 
-                        sw.WriteLine($"Cabeçalho: {cabecalho}"); 
-                        sw.WriteLine("Débito;Crédito"); 
+                        Console.WriteLine($"Salvando cabeçalho: {cabecalho}"); // Log para depuração
+                        sw.WriteLine($"Cabeçalho: {cabecalho}");
+                        sw.WriteLine("Débito;Crédito");
 
-                        decimal totalDebito = 0m; 
-                        decimal totalCredito = 0m; 
+                        decimal totalDebito = 0m;
+                        decimal totalCredito = 0m;
 
                         foreach (var registro in razo.TabelaRazonete().registros)
                         {
-                            decimal debitoDecimal = Convert.ToDecimal(registro.debito); 
-                            decimal creditoDecimal = Convert.ToDecimal(registro.credito); 
+                            decimal debitoDecimal = Convert.ToDecimal(registro.debito);
+                            decimal creditoDecimal = Convert.ToDecimal(registro.credito);
 
-                            sw.WriteLine($"{debitoDecimal:F2};{creditoDecimal:F2}"); 
-                            totalDebito += debitoDecimal;
-                            totalCredito += creditoDecimal; 
+                            // Verifica se os valores não são iguais ao valor padrão (por exemplo, 0)
+                            if (debitoDecimal != 0 || creditoDecimal != 0)
+                            {
+                                Console.WriteLine($"Salvando registro: {debitoDecimal:F2};{creditoDecimal:F2}"); // Log para depuração
+                                sw.WriteLine($"{debitoDecimal:F2};{creditoDecimal:F2}");
+                                totalDebito += debitoDecimal;
+                                totalCredito += creditoDecimal;
+                            }
                         }
 
                         // Salva os totais
-                        sw.WriteLine($"Total;{totalDebito:F2};{totalCredito:F2}"); 
+                        sw.WriteLine($"Total;{totalDebito:F2};{totalCredito:F2}");
+                        Console.WriteLine($"Totais salvos: Débito {totalDebito:F2}, Crédito {totalCredito:F2}"); // Log para depuração
                     }
 
                     MessageBox.Show("Razonetes salvos com sucesso!", "Salvar", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -198,6 +224,10 @@ namespace ConTime.Screens
                 MessageBox.Show($"Erro ao salvar: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+
+
+
 
 
         private void ImportarRazos(string filePath)
@@ -215,9 +245,8 @@ namespace ConTime.Screens
                         if (linhaCabecalho.StartsWith("Cabeçalho:"))
                         {
                             btn_addUC_Click(this, EventArgs.Empty);
-                            _currentRazo = razos.LastOrDefault(); 
+                            _currentRazo = razos.LastOrDefault();
 
-                            // Define o cabeçalho do Razo
                             string cabecalhoTexto = linhaCabecalho.Replace("Cabeçalho: ", "").Trim();
                             _currentRazo.SetCabecalho(cabecalhoTexto);
                             MessageBox.Show($"Cabeçalho importado: '{cabecalhoTexto}'", "Cabeçalho", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -228,17 +257,16 @@ namespace ConTime.Screens
 
                         if (linhaCabecalho.StartsWith("Total:"))
                         {
-                            
                             var totais = linhaCabecalho.Split(';');
-                            if (totais.Length == 3) 
+                            if (totais.Length == 3)
                             {
                                 decimal.TryParse(totais[1].Trim(), out totalDebito);
                                 decimal.TryParse(totais[2].Trim(), out totalCredito);
                             }
-                            continue; 
+                            continue;
                         }
 
-                        var valores = linhaCabecalho.Split(';'); 
+                        var valores = linhaCabecalho.Split(';');
 
                         if (valores.Length == 2 &&
                             decimal.TryParse(valores[0], out decimal debito) &&
@@ -255,8 +283,14 @@ namespace ConTime.Screens
                                 _currentRazo.AddRegistro(debito, credito);
                             }
                         }
-
                     }
+
+                    foreach (var razo in razos)
+                    {
+                        razo.ReapplyDataGridViewSettings();
+                    }
+
+                    RepositionPanels();
 
                     MessageBox.Show("Razonetes importados com sucesso!", "Importar", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -266,6 +300,8 @@ namespace ConTime.Screens
                 MessageBox.Show($"Erro ao importar: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+
 
 
 
@@ -316,6 +352,11 @@ namespace ConTime.Screens
                 }
 
             }
+
+        }
+
+        private void pnl_razonetes_Paint(object sender, PaintEventArgs e)
+        {
 
         }
     }

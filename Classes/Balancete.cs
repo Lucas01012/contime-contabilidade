@@ -22,13 +22,15 @@ namespace ConTime.Classes
             public string conta;
             public float debito;
             public float credito;
+            public float saldo;
 
             public BalanceteRegistro(DataRow dr)
             {
-                codigo = Convert.ToString(dr["codigo"]);
-                conta = Convert.ToString(dr["conta"]);
-                float.TryParse(dr["credor"].ToString(), out credito);
-                float.TryParse(dr["devedor"].ToString(), out debito);
+                codigo = Convert.ToString(dr["Código"]);
+                conta = Convert.ToString(dr["Conta"]);
+                float.TryParse(dr["Credor"].ToString(), out credito);
+                float.TryParse(dr["Devedor"].ToString(), out debito);
+                float.TryParse(dr["Saldo"].ToString(), out saldo);
 
             }
 
@@ -38,8 +40,10 @@ namespace ConTime.Classes
                 table.Cell().Element(PdfComponents.Cell).Text(conta);
                 table.Cell().Element(PdfComponents.Cell).Text($"{credito:C}");
                 table.Cell().Element(PdfComponents.Cell).Text($"{debito:C}");
+                table.Cell().Element(PdfComponents.Cell).Text($"{saldo:C}");
             }
         }
+
 
         public Balancete(DataTable dt)
         {
@@ -61,29 +65,35 @@ namespace ConTime.Classes
                     .Border(1)
                     .Table(table =>
                     {
-
                         table.ColumnsDefinition(columns =>
                         {
-                            columns.ConstantColumn(50);
-                            columns.RelativeColumn(); //fill
-                            columns.ConstantColumn(90);
-                            columns.ConstantColumn(90); //Tamanho fixo
+                            columns.ConstantColumn(50);    // Código
+                            columns.RelativeColumn();      // Conta
+                            columns.ConstantColumn(90);    // Credor
+                            columns.ConstantColumn(90);    // Devedor
+                            columns.ConstantColumn(90);    // Saldo
                         });
+
+                        // Cabeçalho
                         table.Header(header =>
                         {
-                            header.Cell().ColumnSpan(4).BorderColor("#000000").Background("#ffffff").Text(cabecario).FontColor("#000000").AlignCenter();
-                            header.Cell().Element(PdfComponents.Header).Text("Codigo").FontColor(PdfComponents.HeaderFColor);
+                            header.Cell().ColumnSpan(5).BorderColor("#000000").Background("#ffffff")
+                                .Text(cabecario).FontColor("#000000").AlignCenter();
+                            header.Cell().Element(PdfComponents.Header).Text("Código").FontColor(PdfComponents.HeaderFColor);
                             header.Cell().Element(PdfComponents.Header).Text("Conta").FontColor(PdfComponents.HeaderFColor);
                             header.Cell().Element(PdfComponents.Header).Text("Credor").FontColor(PdfComponents.HeaderFColor);
                             header.Cell().Element(PdfComponents.Header).Text("Devedor").FontColor(PdfComponents.HeaderFColor);
+                            header.Cell().Element(PdfComponents.Header).Text("Saldo").FontColor(PdfComponents.HeaderFColor);
                         });
 
+                        // Linhas de dados
                         foreach (var registro in Registros)
                         {
                             registro.CreateCell(table);
                         }
                     });
             }
+
 
             return Document.Create(container =>
             {

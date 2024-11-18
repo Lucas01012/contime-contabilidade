@@ -21,31 +21,79 @@ namespace ConTime.Screens
             InitializeComponent();
             DataTable DT = DS.Tables.Add(tablename);
             dgv.DataSource = DS.Tables[tablename];
-            DT.Columns.Add("codigo");
-            DT.Columns.Add("data");
-            DT.Columns.Add("conta");
-            DT.Columns.Add("historico");
-            DT.Columns.Add("debito");
-            DT.Columns.Add("credito");
+            DT.Columns.Add("Data");
+            DT.Columns.Add("Código");
+            DT.Columns.Add("Conta");
+            DT.Columns.Add("Histórico");
+            DT.Columns.Add("Débito");
+            DT.Columns.Add("Crédito");
+            DT.Columns.Add("Saldo");
 
-            dgv.Columns["codigo"].Width = 65;
-            dgv.Columns["historico"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            dgv.Columns["Código"].Width = 65;
+            dgv.Columns["Histórico"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+
+            MudarCorDataGrid();
         }
 
         private void btn_insert_Click(object sender, EventArgs e)
         {
-            DataRow dr = DS.Tables[0].NewRow();
-            if (rb_c.Checked)
-                dr["credito"] = string.Format("{0:#.00}", Convert.ToDecimal(tb_saldo.Text));
-            else if (rb_d.Checked)
-                dr["debito"] = string.Format("{0:#.00}", Convert.ToDecimal(tb_saldo.Text));
-            dr["data"] = dtp.Text;
-            dr["codigo"] = cb_cod.Text;
-            dr["conta"] = tb_Conta.Text;
-            dr["historico"] = tb_historico.Text;
+            // Verifica se algum campo obrigatório está vazio
+            if (string.IsNullOrWhiteSpace(tb_saldo.Text) ||
+                string.IsNullOrWhiteSpace(tb_valor.Text) ||
+                string.IsNullOrWhiteSpace(cb_cod.Text) ||
+                string.IsNullOrWhiteSpace(tb_Conta.Text) ||
+                string.IsNullOrWhiteSpace(tb_historico.Text))
+            {
+                MessageBox.Show("Por favor, preencha todos os campos obrigatórios.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
-            DS.Tables[0].Rows.Add(dr);
-            DS.Tables[0].AcceptChanges();
+            DataRow dr = DS.Tables[0].NewRow();
+
+            if (decimal.TryParse(tb_saldo.Text, out decimal saldo) && decimal.TryParse(tb_valor.Text, out decimal valor))
+            {
+                decimal valorOriginal = valor;
+
+                if (rb_c.Checked)
+                {
+                    decimal resultadoCredito = saldo + valor;
+                    dr["Crédito"] = string.Format("{0:#.00}", valorOriginal);
+                    saldo = resultadoCredito;
+                }
+                else if (rb_d.Checked)
+                {
+                    decimal resultadoDebito = saldo - valor;
+                    dr["Débito"] = string.Format("{0:#.00}", valorOriginal);
+                    saldo = resultadoDebito;
+                }
+
+                dr["Data"] = dtp.Text;
+                dr["Código"] = cb_cod.Text;
+                dr["Conta"] = tb_Conta.Text;
+                dr["Histórico"] = tb_historico.Text;
+                dr["Saldo"] = string.Format("{0:#.00}", saldo);
+
+                DS.Tables[0].Rows.Add(dr);
+                DS.Tables[0].AcceptChanges();
+
+                LimparCampos();
+            }
+            else
+            {
+                MessageBox.Show("Por favor, insira valores válidos para o saldo e o valor.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
+        private void LimparCampos()
+        {
+            tb_saldo.Clear();
+            tb_valor.Clear();
+            tb_Conta.Clear();
+            tb_historico.Clear();
+            cb_cod.SelectedIndex = -1; 
+            rb_c.Checked = false; 
+            rb_d.Checked = false;
         }
 
         private void btn_delete_Click(object sender, EventArgs e)
@@ -57,21 +105,33 @@ namespace ConTime.Screens
 
         private void GerarPdf(object sender, EventArgs e)
         {
+            if (DS.Tables[tablename].Rows.Count == 0) // Verifica se há linhas na tabela
+            {
+                MessageBox.Show("Não há dados para gerar o PDF.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             Classes.LDia ldia = new(DS.Tables[tablename]);
             ldia.PdfCreate();
         }
 
 
-
         private void button1_Click(object sender, EventArgs e)
         {
-            using (SaveFileDialog sfd = new SaveFileDialog())
+            if (DS.Tables[tablename].Rows.Count == 0) 
             {
-                sfd.Filter = "CSV files (*.csv)|*.csv";
-                sfd.Title = "Salvar Livro Diário";
-                if (sfd.ShowDialog() == DialogResult.OK)
+                MessageBox.Show("Não há dados no Livro Diário para salvar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+            {
+                saveFileDialog.Filter = "Arquivos CSV (*.csv)|*.csv";
+                saveFileDialog.Title = "Salvar Livro Diário";
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    SalvarLDia(sfd.FileName);
+                    SalvarLDia(saveFileDialog.FileName);
                 }
             }
 
@@ -84,18 +144,19 @@ namespace ConTime.Screens
             {
                 using (StreamWriter writer = new StreamWriter(filePath))
                 {
-                    writer.WriteLine("codigo,data,conta,historico,debito,credito");
+                    writer.WriteLine("Codigo,Data,Conta,Histórico,Débito,Crédito, Saldo");
 
                     foreach (DataRow row in DS.Tables[tablename].Rows)
                     {
-                        string codigo = row["codigo"].ToString();
-                        string data = Convert.ToDateTime(row["data"]).ToString("dd/MM/yyyy");
-                        string conta = row["conta"].ToString();
-                        string historico = row["historico"].ToString();
-                        string debito = row["debito"] != DBNull.Value ? Convert.ToDecimal(row["debito"]).ToString("F2", CultureInfo.InvariantCulture) : "";
-                        string credito = row["credito"] != DBNull.Value ? Convert.ToDecimal(row["credito"]).ToString("F2", CultureInfo.InvariantCulture) : "";
+                        string codigo = row["Código"].ToString();
+                        string data = Convert.ToDateTime(row["Data"]).ToString("dd/MM/yyyy");
+                        string conta = row["Conta"].ToString();
+                        string historico = row["Histórico"].ToString();
+                        string debito = row["Débito"] != DBNull.Value ? Convert.ToDecimal(row["Débito"]).ToString("F2", CultureInfo.InvariantCulture) : "";
+                        string credito = row["Crédito"] != DBNull.Value ? Convert.ToDecimal(row["Crédito"]).ToString("F2", CultureInfo.InvariantCulture) : "";
+                        String saldo = row["Saldo"] != DBNull.Value ? Convert.ToDecimal(row["Saldo"]).ToString("F2", CultureInfo.InvariantCulture) : "";
 
-                        writer.WriteLine($"{codigo},{data},{conta},{historico},{debito},{credito}");
+                        writer.WriteLine($"{codigo},{data},{conta},{historico},{debito},{credito}, {saldo}");
                     }
 
                     MessageBox.Show("Dados salvos com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -121,39 +182,41 @@ namespace ConTime.Screens
             }
         }
 
-        private void ImportarLDia(string filePath) {
+        private void ImportarLDia(string filePath)
+        {
             try
             {
                 using (StreamReader reader = new StreamReader(filePath))
                 {
-                    // Limpar o DataTable antes de importar novos dados
-                    DS.Tables[tablename].Clear();
+                    string line = reader.ReadLine(); // Lê a linha do cabeçalho
 
-                    // Ignorar a primeira linha (Cabeçalho)
-                    string line = reader.ReadLine();
-
-                    // Ler cada linha do arquivo CSV
-                    while ((line = reader.ReadLine()) != null)
+                    while ((line = reader.ReadLine()) != null) // Lê cada linha subsequente
                     {
                         string[] data = line.Split(',');
 
-                        if (data.Length == 6) // Verifica se a linha tem o número correto de colunas
+                        if (data.Length == 7) // Certifica-se de que todas as colunas estão presentes
                         {
-                            DataRow row = DS.Tables[tablename].NewRow();
-                            row["codigo"] = data[0];
+                            string codigo = data[0];
+                            string conta = data[2];
 
-                            // Formatação da data
-                            row["data"] = DateTime.ParseExact(data[1], "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                            // Verifica se já existe uma linha com o mesmo Código e Conta
+                            bool jaExiste = DS.Tables[tablename].AsEnumerable().Any(row =>
+                                row.Field<string>("Código") == codigo && row.Field<string>("Conta") == conta);
 
-                            row["conta"] = data[2];
-                            row["historico"] = data[3];
+                            if (!jaExiste) // Só adiciona se não existir
+                            {
+                                DataRow row = DS.Tables[tablename].NewRow();
 
-                            // Verifica se os campos de débito e crédito não estão vazios antes de converter
-                            row["debito"] = string.IsNullOrEmpty(data[4]) ? (object)DBNull.Value : Convert.ToDecimal(data[4], CultureInfo.InvariantCulture);
-                            row["credito"] = string.IsNullOrEmpty(data[5]) ? (object)DBNull.Value : Convert.ToDecimal(data[5], CultureInfo.InvariantCulture);
+                                row["Código"] = codigo;
+                                row["Data"] = DateTime.ParseExact(data[1], "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                                row["Conta"] = conta;
+                                row["Histórico"] = data[3];
+                                row["Débito"] = string.IsNullOrEmpty(data[4]) ? (object)DBNull.Value : Convert.ToDecimal(data[4], CultureInfo.InvariantCulture);
+                                row["Crédito"] = string.IsNullOrEmpty(data[5]) ? (object)DBNull.Value : Convert.ToDecimal(data[5], CultureInfo.InvariantCulture);
+                                row["Saldo"] = string.IsNullOrEmpty(data[6]) ? (object)DBNull.Value : Convert.ToDecimal(data[6], CultureInfo.InvariantCulture);
 
-                            // Adicionar a linha ao DataTable
-                            DS.Tables[tablename].Rows.Add(row);
+                                DS.Tables[tablename].Rows.Add(row); // Adiciona a nova linha
+                            }
                         }
                         else
                         {
@@ -161,13 +224,44 @@ namespace ConTime.Screens
                         }
                     }
 
-                    MessageBox.Show("Dados importados com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Dados importados com sucesso! Linhas duplicadas foram ignoradas.", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Erro ao importar o arquivo CSV: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+
+        private void MudarCorDataGrid()
+        {
+            dtp.BackColor = Color.FromArgb(185, 220, 201);
+            dtp.ForeColor = Color.Black;
+
+            dgv.BackgroundColor = Color.FromArgb(185, 220, 201);
+            dgv.DefaultCellStyle.BackColor = Color.FromArgb(185, 220, 201);
+            dgv.DefaultCellStyle.SelectionBackColor = Color.FromArgb(185, 220, 201);
+            dgv.DefaultCellStyle.Font = new Font("Yu Gothic UI", 12, FontStyle.Bold);
+
+            dgv.ColumnHeadersDefaultCellStyle.Font = new Font ("Yu Gothic UI", 12, FontStyle.Bold);
+            
+
+
+        }
+        private void label4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void dtp_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label5_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
