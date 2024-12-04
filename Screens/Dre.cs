@@ -1,10 +1,13 @@
-﻿using MySql.Data.MySqlClient;
+﻿using ConTime.Classes;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Text;
+using System.Globalization;
 using System.IO.Packaging;
 using System.Linq;
 using System.Text;
@@ -47,8 +50,12 @@ namespace ConTime.Screens
                 TablesInterface[i].ScrollBars = ScrollBars.Vertical;
             }
 
-            // Certifique-se de que o panel10 está dentro do panel1 e não fora dele
             panel10.Parent = panel1;
+        }
+
+        private void painel_Leave(object sender, EventArgs e)
+        {
+            EnviarDreParaDataStore();
         }
 
         private void TableSetup(string name)
@@ -57,6 +64,59 @@ namespace ConTime.Screens
             dt.Columns.Add("Receita");
             dt.Columns.Add("Valor");
         }
+
+        private void EnviarDreParaDataStore()
+        {
+            // Limpa os dados existentes na DRE antes de adicionar novos
+            foreach (var painel in DataStore.DrePanéisData.Values)
+            {
+                painel.Clear();  // Limpa os dados de cada painel
+            }
+
+            foreach (Control control in this.Controls)
+            {
+                if (control is Panel painel)
+                {
+                    foreach (Control subControl in painel.Controls)
+                    {
+                        if (subControl is TextBox txt)
+                        {
+                            string receita = txt.Name.Replace(painel.Name, "").Trim();
+                            string valor = txt.Text;
+
+                            // Adiciona os dados ao painel correspondente no DataStore
+                            DataStore.AdicionarDreData(painel.Name, receita, valor);
+                        }
+                        else if (subControl is Label lbl)
+                        {
+                            string receita = lbl.Name.Replace(painel.Name, "").Trim();
+                            string valor = lbl.Text;
+
+                            // Adiciona os dados ao painel correspondente no DataStore
+                            DataStore.AdicionarDreData(painel.Name, receita, valor);
+                        }
+                    }
+                }
+            }
+
+            // Chama para adicionar os resultados calculados após o preenchimento dos dados da DRE
+            AdicionarResultadosCalculados();
+        }
+
+
+        private void AdicionarResultadosCalculados()
+        {
+            // Adiciona os resultados calculados nos painéis da DRE
+            for (int i = 0; i < resul.Length; i++)
+            {
+                string resultadoConta = $"Resultado {i + 1}";
+                string resultadoValor = resul[i].ToString("C", CultureInfo.CurrentCulture);
+
+                // Adiciona o resultado ao painel "Resultado de Lucro do Exercício"
+                DataStore.AdicionarDreData("Resultado de Lucro do Exercício", resultadoConta, resultadoValor);
+            }
+        }
+
 
         private void btnDrop_Click(object sender, EventArgs e)
         {
@@ -92,7 +152,6 @@ namespace ConTime.Screens
                 Reposition(mainbody, guia.TabIndex, maxsize);
             }
 
-            // Chamar a função para verificar se o conteúdo ultrapassou o limite de altura
             CheckScrollVisibility();
         }
 
@@ -111,22 +170,18 @@ namespace ConTime.Screens
         {
             int totalHeight = 0;
 
-            // Calcular a altura total, considerando todos os controles (expansíveis e não expansíveis)
             foreach (Control control in this.panel1.Controls)
             {
                 if (control is Panel guia)
                 {
-                    // Considera a altura dos painéis visíveis (expansíveis)
                     totalHeight += guia.Visible ? guia.Height : 0;
                 }
                 else
                 {
-                    // Para outros controles não expansíveis, sempre somar a altura
                     totalHeight += control.Height;
                 }
             }
 
-            // Verificar se a altura total dos painéis ultrapassou o limite da tela
             if (totalHeight > this.Height)
             {
                 panel1.VerticalScroll.Visible = true; // Habilita o scroll
@@ -143,8 +198,7 @@ namespace ConTime.Screens
         private void ContentUpdate(object sender, DataGridViewCellEventArgs e)
         {
             DataGridView dgv = (DataGridView)sender;
-            //MessageBox.Show($"Column: {e.ColumnIndex}. Row: {e.RowIndex}");
-            //MessageBox.Show($"Value: {dgv[e.ColumnIndex,e.RowIndex].Value}");
+
             Control guia = dgv.Parent;
             foreach (Panel panel in guia.Controls.OfType<Panel>())
             {
@@ -165,6 +219,7 @@ namespace ConTime.Screens
                     }
                 }
             }
+            EnviarDreParaDataStore();
         }
 
         private void resulchange()
@@ -176,6 +231,7 @@ namespace ConTime.Screens
             {
                 lbl[i].Text = $"{resul[i]:C}";
             }
+            EnviarDreParaDataStore();
         }
 
         private void button6_Click(object sender, EventArgs e)
@@ -185,8 +241,63 @@ namespace ConTime.Screens
 
         private void CreatePdf(object sender, EventArgs e)
         {
+            GerarPdf();
+        }
+
+        public MemoryStream GerarPdf()
+        {
             Classes.Dre dre = new(DS, resul[2], resul[4], resul[7]);
-            dre.PdfCreate();
+
+            try
+            {
+                using (var pdfStream = dre.PdfCreate())
+                {
+                    MemoryStream pdfMemoryStream = new MemoryStream();
+
+                    pdfStream.CopyTo(pdfMemoryStream);
+
+                    OpenPdfForViewing(pdfMemoryStream);
+
+                    return pdfMemoryStream;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao gerar o PDF: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
+            }
+            EnviarDreParaDataStore();
+        }
+
+
+        private void OpenPdfForViewing(MemoryStream pdfStream)
+        {
+            if (pdfStream == null || pdfStream.Length == 0)
+            {
+                throw new ArgumentNullException(nameof(pdfStream), "O stream de PDF está vazio ou é nulo.");
+            }
+
+            string tempFilePath = Path.Combine(Path.GetTempPath(), "tempPDFView.pdf");
+
+            try
+            {
+                using (FileStream fileStream = new FileStream(tempFilePath, FileMode.Create, FileAccess.Write))
+                {
+                    pdfStream.Position = 0;
+                    pdfStream.CopyTo(fileStream);
+                }
+
+                var processInfo = new ProcessStartInfo(tempFilePath)
+                {
+                    UseShellExecute = true
+                };
+
+                Process.Start(processInfo);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao abrir o PDF: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void btn_salvar_dre_Click(object sender, EventArgs e)
@@ -196,59 +307,67 @@ namespace ConTime.Screens
                 saveFileDialog.Filter = "Arquivo CSV (*.csv)|*.csv";
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    SalvarDre(saveFileDialog.FileName);
+                    SalvarDre();
                 }
             }
         }
 
-        private void SalvarDre(string filePath)
+        public void SalvarDre()
         {
-            try
+            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
             {
-                using (StreamWriter writer = new StreamWriter(filePath))
+                saveFileDialog.Filter = "Arquivo CSV (*.csv)|*.csv";
+                saveFileDialog.Title = "Salvar DRE";
+                saveFileDialog.DefaultExt = "csv";
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    foreach (string tableName in Tables)
+                    string filePath = saveFileDialog.FileName;
+
+                    try
                     {
-                        DataTable dt = DS.Tables[tableName];
-                        writer.WriteLine($"Tabela: {tableName}"); // Título da tabela no CSV
-
-                        // Escreve o cabeçalho
-                        writer.WriteLine("Receita,Valor");
-
-                        // Escreve os dados do painel
-                        foreach (DataRow row in dt.Rows)
+                        using (StreamWriter writer = new StreamWriter(filePath))
                         {
-                            string receita = row["Receita"].ToString();
-                            string valor = row["Valor"].ToString();
-                            writer.WriteLine($"{receita},{valor}");
-                        }
-
-                        // Escreve os inputs dos controles (se houver)
-                        foreach (Control ctrl in this.Controls)
-                        {
-                            if (ctrl is TextBox && ctrl.Name.StartsWith(tableName))  // Exemplo: TextBox para cada painel
+                            foreach (string tableName in Tables)
                             {
-                                writer.WriteLine($"{ctrl.Name},{ctrl.Text}");
+                                DataTable dt = DS.Tables[tableName];
+                                writer.WriteLine($"Tabela: {tableName}");
+
+                                writer.WriteLine("Receita,Valor");
+
+                                foreach (DataRow row in dt.Rows)
+                                {
+                                    string receita = row["Receita"].ToString();
+                                    string valor = row["Valor"].ToString();
+                                    writer.WriteLine($"{receita},{valor}");
+                                }
+
+                                foreach (Control ctrl in this.Controls)
+                                {
+                                    if (ctrl is TextBox && ctrl.Name.StartsWith(tableName))
+                                    {
+                                        writer.WriteLine($"{ctrl.Name},{ctrl.Text}");
+                                    }
+                                }
+
+                                writer.WriteLine();
                             }
+
+                            writer.WriteLine($"Resultado Receita Líquida,{lbl[4].Text}");
+                            writer.WriteLine($"Resultado Lucro Operacional,{lbl[5].Text}");
+                            writer.WriteLine($"Resultado Lucro do Exercício,{lbl[7].Text}");
+
+                            MessageBox.Show("Dados salvos com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
-
-                        // Linha em branco entre as tabelas
-                        writer.WriteLine();
                     }
-
-                    // Agora, salva os valores dos resultados calculados no final
-                    writer.WriteLine($"Resultado Receita Líquida,{lbl[4].Text}");
-                    writer.WriteLine($"Resultado Lucro Operacional,{lbl[5].Text}");
-                    writer.WriteLine($"Resultado Lucro do Exercício,{lbl[7].Text}");
-
-                    MessageBox.Show("Dados salvos com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Erro ao exportar o arquivo CSV: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Erro ao exportar o arquivo CSV: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
         }
+
         private void ImportarDre(string filePath)
         {
             try
@@ -268,18 +387,16 @@ namespace ConTime.Screens
                         {
                             string[] values = line.Split(',');
 
-                            if (values.Length == 2) // Lê dados de Receita e Valor
+                            if (values.Length == 2)
                             {
-                                // Verificar se a tabela já foi criada antes de adicionar a linha
                                 if (DS.Tables[currentTable] == null)
                                 {
-                                    DS.Tables.Add(currentTable); // Adicionar a tabela se não existir
+                                    DS.Tables.Add(currentTable);
                                     DataTable dt = DS.Tables[currentTable];
                                     dt.Columns.Add("Receita");
                                     dt.Columns.Add("Valor");
                                 }
 
-                                // Adicionar dados à tabela existente
                                 DataRow row = DS.Tables[currentTable].NewRow();
                                 row["Receita"] = values[0].Trim();
                                 row["Valor"] = values[1].Trim();
@@ -290,7 +407,6 @@ namespace ConTime.Screens
                                 string controlName = values[0].Trim();
                                 string controlValue = values[1].Trim();
 
-                                // Preenche os controles com os dados importados (inputs de cada painel)
                                 foreach (Control ctrl in this.Controls)
                                 {
                                     if (ctrl.Name == controlName)
@@ -299,18 +415,16 @@ namespace ConTime.Screens
                                         {
                                             ((TextBox)ctrl).Text = controlValue;
                                         }
-                                        // Adicione outras verificações conforme necessário (ComboBox, etc.)
+                                     
                                     }
                                 }
                             }
                         }
                     }
 
-                    // Após a importação, forçar atualização dos dados nos painéis
-                    AtualizarPainéis();  // Atualiza os valores nos painéis
+                    AtualizarPainéis();
 
-                    // Atualiza os totais e resultados calculados
-                    AtualizarResultados();  // Atualizar os totais da DRE
+                    AtualizarResultados();
 
                     MessageBox.Show("Dados importados com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -327,7 +441,6 @@ namespace ConTime.Screens
                 DataTable dt = DS.Tables[tableName];
                 DataGridView dgv = null;
 
-                // Encontrar o DataGridView correspondente ao painel
                 switch (tableName)
                 {
                     case "RBruta":
@@ -349,19 +462,16 @@ namespace ConTime.Screens
 
                 if (dgv != null)
                 {
-                    // Limpar apenas se houver linhas a serem removidas
                     if (dt.Rows.Count > 0)
                     {
                         dgv.Rows.Clear();
                     }
 
-                    // Preencher o DataGridView com os dados da tabela
                     foreach (DataRow row in dt.Rows)
                     {
                         dgv.Rows.Add(row["Receita"], row["Valor"]);
                     }
 
-                    // Atualizar os totais após a importação
                     AtualizarResultados();
                 }
             }
@@ -369,15 +479,13 @@ namespace ConTime.Screens
 
         private void AtualizarResultados()
         {
-            // Calcular os totais de cada seção da DRE, com base nos valores importados.
-            resul[2] = resul[0] - resul[1];  // Receita Líquida = Receita Bruta - Impostos
-            resul[4] = resul[2] - resul[3];  // Lucro Operacional Bruto = Receita Líquida - Custos
-            resul[7] = resul[4] - resul[5] + resul[6];  // Resultado de Lucro do Exercício = Lucro Operacional Bruto - Despesas + Outras Receitas
+            resul[2] = resul[0] - resul[1];
+            resul[4] = resul[2] - resul[3];
+            resul[7] = resul[4] - resul[5] + resul[6];
 
-            // Atualizar os labels com os novos valores
-            lbl[4].Text = $"{resul[2]:C}";  // Receita Líquida
-            lbl[5].Text = $"{resul[3]:C}";  // Lucro Operacional Bruto
-            lbl[7].Text = $"{resul[7]:C}";  // Resultado de Lucro do Exercício
+            lbl[4].Text = $"{resul[2]:C}";
+            lbl[5].Text = $"{resul[3]:C}";
+            lbl[7].Text = $"{resul[7]:C}";
         }
         private void panel1_Paint(object sender, PaintEventArgs e)
         {

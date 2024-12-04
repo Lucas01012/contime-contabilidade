@@ -1,21 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using QuestPDF.Fluent;
-using QuestPDF.Infrastructure;
-
-using ConTime.PersonalizedComponents;
+using System.IO;
+using PdfSharpCore.Pdf;
+using PdfSharpCore.Drawing;
 
 namespace ConTime.Classes
 {
-    internal class LDia
+    public class LDia
     {
-        private List<LDiaRegistro> Registros = new();
-        string cabecario = "Lorem Ipsum";
-        private class LDiaRegistro
+        public List<LDiaRegistro> Registros = new();
+        string cabecario = "Livro Diário";
+
+        public class LDiaRegistro
         {
             public string codigo;
             public DateTime data;
@@ -33,19 +30,29 @@ namespace ConTime.Classes
                 historico = Convert.ToString(dr["Histórico"]);
                 float.TryParse(dr["Crédito"].ToString(), out credito);
                 float.TryParse(dr["Débito"].ToString(), out debito);
-                float.TryParse(dr["Saldo"].ToString(), out  saldo);
-                 
+                float.TryParse(dr["Saldo"].ToString(), out saldo);
             }
 
-            public void CreateCell(TableDescriptor table)
+            public void DrawCells(XGraphics gfx, XFont font, double yPosition)
             {
-                table.Cell().Element(PdfComponents.Cell).Text($"{data:d}");
-                table.Cell().Element(PdfComponents.Cell).Text(codigo);
-                table.Cell().Element(PdfComponents.Cell).Text(conta);
-                table.Cell().Element(PdfComponents.Cell).Text(historico);
-                table.Cell().Element(PdfComponents.Cell).Text($"{credito:C}");
-                table.Cell().Element(PdfComponents.Cell).Text($"{debito:C}");
-                table.Cell().Element(PdfComponents.Cell).Text($"{saldo:C}");
+                // Desenhando as células com bordas
+                double[] xPositions = { 30, 105, 180, 255, 330, 405, 480 }; // Posições X para as colunas
+                string[] cellContents = {
+                    data.ToString("d"),
+                    codigo,
+                    conta,
+                    historico ?? "",
+                    $"{credito:C}",
+                    $"{debito:C}",
+                    $"{saldo:C}"
+                };
+
+                // Desenhando as células
+                for (int i = 0; i < cellContents.Length; i++)
+                {
+                    gfx.DrawRectangle(XPens.Black, xPositions[i], yPosition, 75, 20); // Desenhando borda de cada célula
+                    gfx.DrawString(cellContents[i], font, XBrushes.Black, new XRect(xPositions[i], yPosition, 75, 20), XStringFormats.Center); // Texto centralizado
+                }
             }
         }
 
@@ -53,66 +60,59 @@ namespace ConTime.Classes
         {
             foreach (DataRow dr in dt.Rows)
             {
-                if(dr != dt.NewRow())
+                if (dr != dt.NewRow())
                 {
                     Registros.Add(new LDiaRegistro(dr));
                 }
             }
         }
-        #region PDF
-        private Document CreatePDF()
-        {
-            void ComposeTable(IContainer container)
-            {
-                container
-                    .Shrink()
-                    .Border(1)
-                    .Table(table =>
-                    {
-                        table.ColumnsDefinition(columns =>
-                        {
-                            columns.ConstantColumn(50);
-                            columns.ConstantColumn(75);
-                            columns.RelativeColumn();//Tamanho fixo
-                            columns.RelativeColumn(); //fill
-                            columns.RelativeColumn(2);
-                            columns.ConstantColumn(90); 
-                            columns.ConstantColumn(90);
-                        });
-                        table.Header(header =>
-                        {
-                            header.Cell().ColumnSpan(7).Background("#ffffff").Text(cabecario).FontColor("#000000").AlignCenter();
-                            header.Cell().Element(PdfComponents.Header).Text("Data").FontColor(PdfComponents.HeaderFColor);
-                            header.Cell().Element(PdfComponents.Header).Text("Codigo").FontColor(PdfComponents.HeaderFColor);
-                            header.Cell().Element(PdfComponents.Header).Text("Conta").FontColor(PdfComponents.HeaderFColor);
-                            header.Cell().Element(PdfComponents.Header).Text("Historico").FontColor(PdfComponents.HeaderFColor);
-                            header.Cell().Element(PdfComponents.Header).Text("Credito").FontColor(PdfComponents.HeaderFColor);
-                            header.Cell().Element(PdfComponents.Header).Text("Debito").FontColor(PdfComponents.HeaderFColor);
-                            header.Cell().Element(PdfComponents.Header).Text("Saldo").FontColor(PdfComponents.HeaderFColor);
-                        });
 
-                        foreach(var registro in Registros)
-                        {
-                            registro.CreateCell(table);
-                        }
-                    });
+        #region PDF
+
+        public MemoryStream PdfCreate()
+        {
+            // Criando um fluxo de memória para armazenar o PDF
+            MemoryStream pdfStream = new MemoryStream();
+            PdfDocument document = new PdfDocument();
+            PdfPage page = document.AddPage();
+            XGraphics gfx = XGraphics.FromPdfPage(page);
+            XFont font = new XFont("Arial", 10);
+
+            double yPosition = 20;
+            double xPosition = 30; // Inicializando o xPosition para a tabela
+
+            // Cabeçalho da Tabela
+            gfx.DrawString(cabecario, new XFont("Arial", 14, XFontStyle.Bold), XBrushes.Black, new XRect(0, yPosition, page.Width, 20), XStringFormats.Center);
+            yPosition += 25;
+
+            // Desenhando a primeira linha do cabeçalho da tabela
+            gfx.DrawRectangle(XPens.Black, xPosition, yPosition, 75 * 7, 20); // Linha do cabeçalho
+            gfx.DrawString("Data", font, XBrushes.Black, new XRect(xPosition, yPosition, 75, 20), XStringFormats.Center);
+            gfx.DrawString("Código", font, XBrushes.Black, new XRect(xPosition + 75, yPosition, 75, 20), XStringFormats.Center);
+            gfx.DrawString("Conta", font, XBrushes.Black, new XRect(xPosition + 150, yPosition, 75, 20), XStringFormats.Center);
+            gfx.DrawString("Histórico", font, XBrushes.Black, new XRect(xPosition + 225, yPosition, 75, 20), XStringFormats.Center);
+            gfx.DrawString("Crédito", font, XBrushes.Black, new XRect(xPosition + 300, yPosition, 75, 20), XStringFormats.Center);
+            gfx.DrawString("Débito", font, XBrushes.Black, new XRect(xPosition + 375, yPosition, 75, 20), XStringFormats.Center);
+            gfx.DrawString("Saldo", font, XBrushes.Black, new XRect(xPosition + 450, yPosition, 75, 20), XStringFormats.Center);
+            yPosition += 25;
+
+            // Desenhando as linhas de dados da tabela
+            foreach (var registro in Registros)
+            {
+                registro.DrawCells(gfx, font, yPosition);
+                yPosition += 25;
+
+                // Desenhando a linha após cada linha de dados
+                gfx.DrawLine(XPens.Black, xPosition, yPosition, xPosition + 75 * 7, yPosition); // Linha horizontal entre os dados
             }
 
-            return Document.Create(container =>
-            {
-                container.Page(page => //Eu sinceramente não entendo como paginas funcionam
-                {
-                    page.Content().Column(c => ComposeTable(c.Item()));
-                });
-            });
+            // Salvando o PDF em um fluxo de memória
+            document.Save(pdfStream);
+            pdfStream.Position = 0; // Ajuste para garantir que o fluxo seja lido do início
+
+            return pdfStream;
         }
 
-        public void PdfCreate()
-        {
-            var pdfdoc = CreatePDF();
-            //var fileName = "Test.pdf";
-            pdfdoc.GeneratePdfAndShow();
-        }
         #endregion
     }
 }

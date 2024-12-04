@@ -3,7 +3,27 @@
   "WorkspaceRootPath": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|c:\\users\\lucas\\source\\repos\\contime-contabilidade\\screens\\bpat.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|c:\\users\\lucas\\source\\repos\\contime-contabilidade\\screens\\exer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\exer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\screens\\dre.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\dre.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|c:\\users\\lucas\\source\\repos\\contime-contabilidade\\classes\\dre.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:classes\\dre.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|c:\\users\\lucas\\source\\repos\\contime-contabilidade\\classes\\datastore.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:classes\\datastore.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|c:\\users\\lucas\\source\\repos\\contime-contabilidade\\classes\\bpat.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:classes\\bpat.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\screens\\bpat.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\bpat.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
@@ -11,12 +31,12 @@
       "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\bpat.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|c:\\users\\lucas\\source\\repos\\contime-contabilidade\\classes\\ldia.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:classes\\ldia.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\screens\\razonete.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\razonete.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|c:\\users\\lucas\\source\\repos\\contime-contabilidade\\screens\\razo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\razo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|c:\\users\\lucas\\source\\repos\\contime-contabilidade\\screens\\razonete.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\razonete.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\screens\\bal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
@@ -27,44 +47,28 @@
       "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\bal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\form_body.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:form_body.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|c:\\users\\lucas\\source\\repos\\contime-contabilidade\\classes\\balancopatrimonialdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:classes\\balancopatrimonialdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|c:\\users\\lucas\\source\\repos\\contime-contabilidade\\screens\\dre.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\dre.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\screens\\dre.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\dre.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|c:\\users\\lucas\\source\\repos\\contime-contabilidade\\screens\\ldia.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\ldia.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|c:\\users\\lucas\\source\\repos\\contime-contabilidade\\screens\\razonete.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\razonete.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|c:\\users\\lucas\\source\\repos\\contime-contabilidade\\classes\\razonetes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:classes\\razonetes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\screens\\razonete.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\razonete.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\screens\\razo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\razo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|c:\\users\\lucas\\source\\repos\\contime-contabilidade\\contime.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:contime.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\screens\\exer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\exer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
       "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\screens\\ldia.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\ldia.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|c:\\users\\lucas\\source\\repos\\contime-contabilidade\\screens\\ldia.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\ldia.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\screens\\planocon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{DA19F645-C61B-425B-871F-D9B7D9CAF598}|ConTime.csproj|solutionrelative:screens\\planocon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     }
   ],
   "DocumentGroupContainers": [
@@ -74,201 +78,226 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 0,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Exer.cs",
+              "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\Exer.cs",
+              "RelativeDocumentMoniker": "Screens\\Exer.cs",
+              "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\Exer.cs",
+              "RelativeToolTip": "Screens\\Exer.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-20T18:45:13.592Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "BPat.cs",
-              "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\BPat.cs",
-              "RelativeDocumentMoniker": "Screens\\BPat.cs",
-              "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\BPat.cs",
-              "RelativeToolTip": "Screens\\BPat.cs",
-              "ViewState": "AgIAAEoBAAAAAAAAAAApwFgBAAAAAAAAAAAAAA==",
+              "DocumentIndex": 11,
+              "Title": "BalancoPatrimonialData.cs",
+              "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Classes\\BalancoPatrimonialData.cs",
+              "RelativeDocumentMoniker": "Classes\\BalancoPatrimonialData.cs",
+              "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Classes\\BalancoPatrimonialData.cs",
+              "RelativeToolTip": "Classes\\BalancoPatrimonialData.cs",
+              "ViewState": "AgIAACAAAAAAAAAAAAAAwC8AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-17T15:48:27.787Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "BPat.cs [Projeto]",
-              "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\BPat.cs",
-              "RelativeDocumentMoniker": "Screens\\BPat.cs",
-              "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\BPat.cs [Projeto]",
-              "RelativeToolTip": "Screens\\BPat.cs [Projeto]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-17T15:37:46.758Z",
-              "EditorCaption": " [Projeto]"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "Razonete.cs",
-              "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\Razonete.cs",
-              "RelativeDocumentMoniker": "Screens\\Razonete.cs",
-              "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\Razonete.cs",
-              "RelativeToolTip": "Screens\\Razonete.cs",
-              "ViewState": "AgIAACQAAAAAAAAAAAAowB0AAAA4AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-17T14:07:37.941Z",
+              "WhenOpened": "2024-12-04T21:34:47.452Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 10,
-              "Title": "Razonete.cs [Projeto]",
-              "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\Razonete.cs",
-              "RelativeDocumentMoniker": "Screens\\Razonete.cs",
-              "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\Razonete.cs [Projeto]",
-              "RelativeToolTip": "Screens\\Razonete.cs [Projeto]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-17T14:07:34.933Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "Form_Body.cs [Projeto]",
-              "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Form_Body.cs",
-              "RelativeDocumentMoniker": "Form_Body.cs",
-              "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Form_Body.cs [Projeto]",
-              "RelativeToolTip": "Form_Body.cs [Projeto]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-17T13:33:31.408Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 14,
-              "Title": "LDia.Designer.cs",
-              "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\LDia.Designer.cs",
-              "RelativeDocumentMoniker": "Screens\\LDia.Designer.cs",
-              "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\LDia.Designer.cs",
-              "RelativeToolTip": "Screens\\LDia.Designer.cs",
-              "ViewState": "AgIAABYAAAAAAAAAAAAgwAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-17T13:29:02.846Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 15,
-              "Title": "PlanoCon.cs [Projeto]",
-              "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\PlanoCon.cs",
-              "RelativeDocumentMoniker": "Screens\\PlanoCon.cs",
-              "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\PlanoCon.cs [Projeto]",
-              "RelativeToolTip": "Screens\\PlanoCon.cs [Projeto]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-17T13:28:13.404Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "ConTime.csproj",
-              "DocumentMoniker": "C:\\Users\\Lucas\\Source\\Repos\\contime-contabilidade\\ConTime.csproj",
-              "RelativeDocumentMoniker": "ConTime.csproj",
-              "ToolTip": "C:\\Users\\Lucas\\Source\\Repos\\contime-contabilidade\\ConTime.csproj",
-              "RelativeToolTip": "ConTime.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2024-11-17T13:26:50.723Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "LDia.cs [Projeto]",
-              "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\LDia.cs",
-              "RelativeDocumentMoniker": "Screens\\LDia.cs",
-              "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\LDia.cs [Projeto]",
-              "RelativeToolTip": "Screens\\LDia.cs [Projeto]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-17T13:25:15.92Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "LDia.cs",
-              "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Classes\\LDia.cs",
-              "RelativeDocumentMoniker": "Classes\\LDia.cs",
-              "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Classes\\LDia.cs",
-              "RelativeToolTip": "Classes\\LDia.cs",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-17T13:25:00.359Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Razo.cs",
-              "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\Razo.cs",
-              "RelativeDocumentMoniker": "Screens\\Razo.cs",
-              "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\Razo.cs",
-              "RelativeToolTip": "Screens\\Razo.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAIgAAAAMAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-17T11:28:32.283Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "Razo.cs [Projeto]",
-              "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\Razo.cs",
-              "RelativeDocumentMoniker": "Screens\\Razo.cs",
-              "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\Razo.cs [Projeto]",
-              "RelativeToolTip": "Screens\\Razo.cs [Projeto]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-17T11:25:50.702Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
               "Title": "Bal.cs",
               "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\Bal.cs",
               "RelativeDocumentMoniker": "Screens\\Bal.cs",
               "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\Bal.cs",
               "RelativeToolTip": "Screens\\Bal.cs",
-              "ViewState": "AgIAAOYAAAAAAAAAAAAWwOkAAAAOAAAAAAAAAA==",
+              "ViewState": "AgIAAJ0BAAAAAAAAAADwv3YBAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-15T16:46:20.411Z",
+              "WhenOpened": "2024-12-01T22:22:38.853Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "Dre.cs",
-              "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\Dre.cs",
-              "RelativeDocumentMoniker": "Screens\\Dre.cs",
-              "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\Dre.cs",
-              "RelativeToolTip": "Screens\\Dre.cs",
-              "ViewState": "AgIAANIAAAAAAAAAAADwv9IAAAAVAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-15T16:36:48.907Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 9,
               "Title": "Bal.cs [Projeto]",
               "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\Bal.cs",
               "RelativeDocumentMoniker": "Screens\\Bal.cs",
               "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\Bal.cs [Projeto]",
               "RelativeToolTip": "Screens\\Bal.cs [Projeto]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-15T16:27:23.559Z"
+              "WhenOpened": "2024-12-01T22:22:36.71Z",
+              "EditorCaption": " [Projeto]"
             },
             {
               "$type": "Document",
               "DocumentIndex": 8,
+              "Title": "Razonete.cs",
+              "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\Razonete.cs",
+              "RelativeDocumentMoniker": "Screens\\Razonete.cs",
+              "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\Razonete.cs",
+              "RelativeToolTip": "Screens\\Razonete.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-01T22:21:01.268Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Razonete.cs [Projeto]",
+              "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\Razonete.cs",
+              "RelativeDocumentMoniker": "Screens\\Razonete.cs",
+              "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\Razonete.cs [Projeto]",
+              "RelativeToolTip": "Screens\\Razonete.cs [Projeto]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-01T22:20:59.694Z",
+              "EditorCaption": " [Projeto]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "BPat.cs",
+              "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\BPat.cs",
+              "RelativeDocumentMoniker": "Screens\\BPat.cs",
+              "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\BPat.cs",
+              "RelativeToolTip": "Screens\\BPat.cs",
+              "ViewState": "AgIAAM0BAAAAAAAAAAAowLQBAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-01T22:13:09.314Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "BPat.cs [Projeto]",
+              "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\BPat.cs",
+              "RelativeDocumentMoniker": "Screens\\BPat.cs",
+              "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\BPat.cs [Projeto]",
+              "RelativeToolTip": "Screens\\BPat.cs [Projeto]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-01T22:13:07.379Z",
+              "EditorCaption": " [Projeto]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "BPat.cs",
+              "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Classes\\BPat.cs",
+              "RelativeDocumentMoniker": "Classes\\BPat.cs",
+              "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Classes\\BPat.cs",
+              "RelativeToolTip": "Classes\\BPat.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAC8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-01T22:12:52.905Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "DataStore.cs",
+              "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Classes\\DataStore.cs",
+              "RelativeDocumentMoniker": "Classes\\DataStore.cs",
+              "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Classes\\DataStore.cs",
+              "RelativeToolTip": "Classes\\DataStore.cs",
+              "ViewState": "AgIAAHAAAAAAAAAAAAAUwIMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-30T23:47:55.596Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Dre.cs",
+              "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Classes\\Dre.cs",
+              "RelativeDocumentMoniker": "Classes\\Dre.cs",
+              "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Classes\\Dre.cs",
+              "RelativeToolTip": "Classes\\Dre.cs",
+              "ViewState": "AgIAAGAAAAAAAAAAAAAmwEYAAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-01T18:43:53.955Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "Dre.cs [Projeto]",
               "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\Dre.cs",
               "RelativeDocumentMoniker": "Screens\\Dre.cs",
               "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\Dre.cs [Projeto]",
               "RelativeToolTip": "Screens\\Dre.cs [Projeto]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-15T16:26:20.089Z"
+              "WhenOpened": "2024-12-01T18:43:43.435Z",
+              "EditorCaption": " [Projeto]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "LDia.cs",
+              "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\LDia.cs",
+              "RelativeDocumentMoniker": "Screens\\LDia.cs",
+              "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\LDia.cs",
+              "RelativeToolTip": "Screens\\LDia.cs",
+              "ViewState": "AgIAAHABAAAAAAAAAAAAAHMAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-01T22:24:49.439Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "Dre.cs",
+              "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\Dre.cs",
+              "RelativeDocumentMoniker": "Screens\\Dre.cs",
+              "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\Dre.cs",
+              "RelativeToolTip": "Screens\\Dre.cs",
+              "ViewState": "AgIAAEIAAAAAAAAAAAAnwMUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-01T18:43:45.956Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "LDia.cs [Projeto]",
+              "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\LDia.cs",
+              "RelativeDocumentMoniker": "Screens\\LDia.cs",
+              "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\LDia.cs [Projeto]",
+              "RelativeToolTip": "Screens\\LDia.cs [Projeto]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-01T22:24:47.68Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "Razonetes.cs",
+              "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Classes\\Razonetes.cs",
+              "RelativeDocumentMoniker": "Classes\\Razonetes.cs",
+              "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Classes\\Razonetes.cs",
+              "RelativeToolTip": "Classes\\Razonetes.cs",
+              "ViewState": "AgIAAK0AAAAAAAAAAAAAwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-04T13:57:00.557Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "Exer.cs [Projeto]",
+              "DocumentMoniker": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\Exer.cs",
+              "RelativeDocumentMoniker": "Screens\\Exer.cs",
+              "ToolTip": "C:\\Users\\Lucas\\source\\repos\\contime-contabilidade\\Screens\\Exer.cs [Projeto]",
+              "RelativeToolTip": "Screens\\Exer.cs [Projeto]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-01T22:26:58.798Z",
+              "EditorCaption": " [Projeto]"
             }
           ]
         }

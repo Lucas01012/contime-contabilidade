@@ -5,135 +5,122 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ConTime.Screens;
-using QuestPDF.Fluent;
-using QuestPDF.Infrastructure;
+using PdfSharpCore.Drawing;
+using PdfSharpCore.Pdf;
+using System.Globalization;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace ConTime.Classes
 {
+
+
     internal class Dre
     {
-        readonly public static string[] tipo =
-        [
-            "RBruta",
-            "Imposto",
-            "Custos",
-            "Despesas",
-            "OutrasR"
-        ];
-        List<DreRegistro> RBruta = new(); // (+)
-        List<DreRegistro> Impostos = new(); // (-)
-        float RLiquida; // (=)
-        List<DreRegistro> Custos = new(); // (-)
-        float LBruto; // (=)
-        List<DreRegistro> Despesas = new(); // (-)
-        List<DreRegistro> OutrasR = new(); // (+)
-        float LLiquido; // (=)
+        public static string[] tipo = { "RBruta", "Imposto", "Custos", "Despesas", "OutrasR" };
 
-        private List<DreRegistro>[] DreRegistros;
+        private readonly List<DreRegistro> RBruta = new();
+        private readonly List<DreRegistro> Impostos = new();
+        private readonly List<DreRegistro> Custos = new();
+        private readonly List<DreRegistro> Despesas = new();
+        private readonly List<DreRegistro> OutrasR = new();
+
+        private readonly List<DreRegistro>[] DreRegistros;
+
+        private readonly float RLiquida;
+        private readonly float LBruto;
+        private readonly float LLiquido;
 
         internal class DreRegistro
         {
-            internal string conta;
-            internal float valor;
+            public string Conta { get; set; }
+            public float Valor { get; set; }
 
             public DreRegistro(DataRow dr)
             {
-                this.conta = Convert.ToString(dr["Receita"]);
-                float.TryParse(Convert.ToString(dr["Valor"]),out valor);
+                Conta = Convert.ToString(dr["Receita"]);
+                float.TryParse(Convert.ToString(dr["Valor"]), out var valor);
+                Valor = valor;
             }
         }
 
         public Dre(DataSet ds, float liquida, float bruta, float lucro)
         {
-            DreRegistros = [RBruta, Impostos, Custos, Despesas, OutrasR];
+            DreRegistros = new[] { RBruta, Impostos, Custos, Despesas, OutrasR };
 
-            foreach(string nomeDreRegistro in tipo)
+            foreach (string nomeDreRegistro in tipo)
             {
                 DataTable dt = ds.Tables[nomeDreRegistro];
-                foreach(DataRow dr in dt.Rows)
+                foreach (DataRow dr in dt.Rows)
                 {
-                    DreRegistros[Array.FindIndex(tipo, w =>  w == nomeDreRegistro)].Add(new DreRegistro(dr));
+                    DreRegistros[Array.FindIndex(tipo, w => w == nomeDreRegistro)].Add(new DreRegistro(dr));
                 }
             }
-            this.RLiquida = liquida;
-            this.LBruto = bruta;
-            this.LLiquido = lucro;
-        }
-        #region PDF
-        public void PdfCreate()
-        {
-            var pdf = CreatePDF();
-            pdf.GeneratePdfAndShow();
+
+            RLiquida = liquida;
+            LBruto = bruta;
+            LLiquido = lucro;
         }
 
-        private Document CreatePDF()
+
+        public MemoryStream PdfCreate()
         {
-            string
-                HeaderBGColor = "#000000", HeaderFColor = "#ffffff",
-                LabelBGColor = "#aaaaaa", LabelFColor = "#000000", LabelBorderColor = "#666666",
-                CellBGColor = "#ffffff", CellFColor = "#000000";
+            var pdfDocument = new PdfDocument();
+            var page = pdfDocument.AddPage();
+            var graphics = XGraphics.FromPdfPage(page);
 
+            // Configurações de fontes e cores
+            var headerFont = new XFont("Arial", 12, XFontStyle.Bold);
+            var cellFont = new XFont("Arial", 10, XFontStyle.Regular);
+            var headerBrush = XBrushes.White;
+            var cellBrush = XBrushes.Black;
+            var headerBackground = XBrushes.Black;
+            var labelBackground = XBrushes.LightGray;
 
-            void ComposeTable(IContainer container)
+            // Dimensões
+            double marginLeft = 50, marginTop = 50, cellHeight = 20, tableWidth = 500;
+            double x = marginLeft, y = marginTop;
+
+            // Desenha cabeçalho
+            graphics.DrawRectangle(headerBackground, x, y, tableWidth, cellHeight);
+            graphics.DrawString("Cabeçalho DRE", headerFont, headerBrush, new XRect(x, y, tableWidth, cellHeight), XStringFormats.Center);
+            y += cellHeight;
+
+            // Método para desenhar linhas da tabela
+            void DrawRow(string label, string value, bool isLabel = false)
             {
-                container
-                    .Table(t =>
-                    {
-                        void addcell(string? value) => t.Cell().Border(1).BorderColor("#000000").Background(CellBGColor).Text(value).FontColor(CellFColor);
-                        void addlabel(string? value, uint ColumnSpan) => t.Cell().ColumnSpan(ColumnSpan).Border(1).BorderColor(LabelBorderColor).Background(LabelBGColor).Text(value).FontColor(LabelFColor);
-                        void addempty() => t.Cell().ColumnSpan(2).Border(1).BorderColor("#000000").Background(CellBGColor);
-
-                        void CreateTable(List<DreRegistro> DreRegistros)
-                        {
-                            foreach(DreRegistro t in DreRegistros)
-                            {
-                                addcell(t.conta);
-                                addcell($"{t.valor:C}");
-                            }
-                        }
-
-                        t.ColumnsDefinition(c =>
-                        {
-                            c.RelativeColumn();
-                            c.ConstantColumn(100);
-                        });
-                        t.Header(h =>
-                        {
-                            h.Cell().ColumnSpan(2).BorderColor("#ffffff").Background(HeaderBGColor).Text("Cabeçario DRE").FontColor(HeaderFColor).AlignCenter();
-                            h.Cell().ColumnSpan(1).Border(1).BorderColor("#ffffff").Background(HeaderBGColor).Text("Conta").FontColor(HeaderFColor);
-                            h.Cell().ColumnSpan(1).Border(1).BorderColor("#ffffff").Background(HeaderBGColor).Text("Saldo").FontColor(HeaderFColor);
-                        });
-                        addlabel("Receita Bruta", 2);
-                        CreateTable(DreRegistros[0]);
-                        addlabel("(-)Impostos", 2);
-                        CreateTable(DreRegistros[1]);
-                        addlabel("(=)Receita Liquida:", 1);
-                        addlabel($"{RLiquida:C}", 1);
-                        addlabel("(-)Custos", 2);
-                        CreateTable(DreRegistros[2]);
-                        addlabel("(=)Lucro Operacional Bruto:", 1);
-                        addlabel($"{LBruto:C}", 1);
-                        addlabel("(-)Despesas", 2);
-                        CreateTable(DreRegistros[3]);
-                        addlabel("(+)Outras Receitas", 2);
-                        CreateTable(DreRegistros[4]);
-                        addlabel("(=)Resultado de Lucro do Exercicio:", 1);
-                        addlabel($"{LLiquido:C}", 1);
-                    });
+                var background = isLabel ? labelBackground : XBrushes.White;
+                graphics.DrawRectangle(background, x, y, tableWidth, cellHeight);
+                graphics.DrawString(label, cellFont, cellBrush, new XRect(x, y, tableWidth / 2, cellHeight), XStringFormats.CenterLeft);
+                graphics.DrawString(value, cellFont, cellBrush, new XRect(x + tableWidth / 2, y, tableWidth / 2, cellHeight), XStringFormats.CenterRight);
+                y += cellHeight;
             }
 
-            return Document.Create(container =>
+            // Adiciona seções
+            void AddSection(string sectionTitle, List<DreRegistro> registros)
             {
-                container.Page(page =>
+                DrawRow(sectionTitle, string.Empty, isLabel: true);
+                foreach (var registro in registros)
                 {
-                    page.Content().Column(c =>
-                    {
-                        ComposeTable(c.Item());
-                    });
-                });
-            });
+                    DrawRow(registro.Conta, registro.Valor.ToString("C", CultureInfo.CurrentCulture));
+                }
+            }
+
+            // Desenha seções da DRE
+            AddSection("Receita Bruta", RBruta);
+            AddSection("(-) Impostos", Impostos);
+            DrawRow("(=) Receita Líquida", RLiquida.ToString("C", CultureInfo.CurrentCulture), isLabel: true);
+            AddSection("(-) Custos", Custos);
+            DrawRow("(=) Lucro Operacional Bruto", LBruto.ToString("C", CultureInfo.CurrentCulture), isLabel: true);
+            AddSection("(-) Despesas", Despesas);
+            AddSection("(+) Outras Receitas", OutrasR);
+            DrawRow("(=) Resultado de Lucro do Exercício", LLiquido.ToString("C", CultureInfo.CurrentCulture), isLabel: true);
+
+            // Salva o PDF em um MemoryStream
+            var stream = new MemoryStream();
+            pdfDocument.Save(stream, false);
+            stream.Position = 0;
+            return stream;
         }
-        #endregion
     }
+
 }

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ConTime")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7ac8537a8935803f2744a3adb71366b8c8a7b945")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+321f1a111e090359d5baa9b84d57426e5200e601")]
 [assembly: System.Reflection.AssemblyProductAttribute("ConTime")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ConTime")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

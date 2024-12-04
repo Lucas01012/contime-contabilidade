@@ -141,7 +141,7 @@
             btn_Exer.FlatStyle = FlatStyle.Flat;
             btn_Exer.Font = new Font("Yu Gothic UI", 14.25F, FontStyle.Bold);
             btn_Exer.ForeColor = Color.FromArgb(43, 100, 53);
-            btn_Exer.Image = Properties.Resources.schedule_7884931__2_;
+            btn_Exer.Image = (Image)resources.GetObject("btn_Exer.Image");
             btn_Exer.ImageAlign = ContentAlignment.MiddleLeft;
             btn_Exer.Location = new Point(11, 361);
             btn_Exer.Margin = new Padding(4);
@@ -152,7 +152,8 @@
             btn_Exer.Size = new Size(199, 64);
             btn_Exer.TabIndex = 5;
             btn_Exer.Tag = "Exercicios";
-            btn_Exer.Text = "Exercicios";
+            btn_Exer.Text = "Gerenciamento de Projeto";
+            btn_Exer.TextImageRelation = TextImageRelation.ImageBeforeText;
             btn_Exer.UseVisualStyleBackColor = false;
             btn_Exer.Click += btn_Exer_Click;
             // 

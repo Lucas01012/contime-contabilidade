@@ -198,10 +198,8 @@ namespace ConTime
         private Razonete sv_razonete = new();
         private Dre sv_Dre = new();
         private BPat sv_BPat = new();
-        private Exer sv_Exer = new();
-        private LDia sv_LDia = new();
+        private LDia sv_LDia = new ();
         private Bal sv_Bal = new();
-
         private void AddScreen(UserControl uc)
         {
             uc.Dock = DockStyle.Fill;
@@ -233,8 +231,31 @@ namespace ConTime
 
         private void btn_Exer_Click(object sender, EventArgs e)
         {
-            AddScreen(sv_Exer);
+            // Certifique-se de que o balControl foi inicializado
+            Bal balControl = new Bal();
+
+            // Cria uma nova instância da tela Exer passando a instância de Bal
+           Exer exerScreen = new Exer();
+
+            // Cria um novo formulário
+            Form popUpForm = new Form();
+
+            // Ajusta o tamanho do formulário para o desejado (tamanho pequeno para o pop-up)
+            popUpForm.Size = new Size(300, 200); // Tamanho pequeno (300x200 é só um exemplo)
+
+            // Define algumas propriedades do formulário para parecer um pop-up
+            popUpForm.FormBorderStyle = FormBorderStyle.FixedDialog;  // Sem borda redimensionável
+            popUpForm.StartPosition = FormStartPosition.CenterParent; // Centraliza o formulário
+            popUpForm.MinimizeBox = false;  // Desativa a opção de minimizar
+            popUpForm.MaximizeBox = false;  // Desativa a opção de maximizar
+
+            // Adiciona o UserControl ao formulário
+            popUpForm.Controls.Add(exerScreen);
+
+            // Exibe o formulário como um pop-up
+            popUpForm.ShowDialog();
         }
+
 
         private void btn_LDia_Click(object sender, EventArgs e)
         {

@@ -1,11 +1,11 @@
 ﻿using System;
+using PdfSharpCore.Pdf;
+using PdfSharpCore.Drawing;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using QuestPDF.Fluent;
-using QuestPDF.Infrastructure;
+using System.IO;
 
 using ConTime.PersonalizedComponents;
 
@@ -20,162 +20,141 @@ namespace ConTime.Classes
         public List<BPRegistro> PsvCirculante = new();
         public List<BPRegistro> PsvNCirculante = new();
         public List<BPRegistro> Patrimonio = new();
-        private List<BPRegistro>[] listas = new List<BPRegistro>[5];
-        public float TotalAtivo;
-        public float TotalPassivo;
+        private List<BPRegistro>[] listas;
+        public float TotalAtivo { get; set; }
+        public float TotalPassivo { get; set; }
 
-        public BPat(DataSet ds, string header, float TAtivo, float TPassivo)
+        public BPat(DataSet ds, string header, float totalAtivo, float totalPassivo)
         {
-            listas = [AtvCirculante, AtvNCirculante, PsvCirculante, PsvNCirculante, Patrimonio];
             this.Header = header;
-            this.TotalAtivo = TAtivo;
-            this.TotalPassivo = TPassivo;
+            this.TotalAtivo = totalAtivo;
+            this.TotalPassivo = totalPassivo;
+            listas = new List<BPRegistro>[] { AtvCirculante, AtvNCirculante, PsvCirculante, PsvNCirculante, Patrimonio };
+
             foreach (KeyValuePair<short, string> rTable in BPRegistro.rkey)
             {
                 DataTable dt = ds.Tables[rTable.Value];
-                foreach(DataRow dr in dt.Rows)
+                foreach (DataRow dr in dt.Rows)
                 {
                     listas[rTable.Key].Add(new BPRegistro(dr, rTable.Key));
                 }
             }
         }
+
+
         #region PDF
-        public void PdfCreate()
+        public MemoryStream PdfCreate()
         {
             var pdfdoc = CreatePdf();
-            pdfdoc.GeneratePdfAndShow();
+
+            MemoryStream ms = new MemoryStream();
+
+            pdfdoc.Save(ms);
+
+            ms.Seek(0, SeekOrigin.Begin);
+
+            return ms;
         }
-        private Document CreatePdf()
+
+        public PdfDocument CreatePdf()
         {
-            Dictionary<string, List<BPRegistro>> ativos = new()
-            { 
-                {"Ativo Circulante", AtvCirculante}, 
-                {"Ativo não Circulante", AtvNCirculante}
-            };
-            Dictionary<string, List<BPRegistro>> passivos = new()
-            { 
-                {"Passivo Circulante", PsvCirculante}, 
-                {"Passivo não Circulante", PsvNCirculante},
-                {"Patrimônio", Patrimonio}
-            };
-            Dictionary<string, Dictionary<string, List<BPRegistro>>> colunas = new()
+            PdfDocument pdfdoc = new PdfDocument();
+            PdfPage page = pdfdoc.AddPage();
+            XGraphics gfx = XGraphics.FromPdfPage(page);
+            XFont font = new XFont("Arial", 12);
+            XFont fontBold = new XFont("Arial", 12, XFontStyle.Bold);
+
+            double x = 50;
+            double y = 50;
+
+            gfx.DrawString("Balanço Patrimonial", fontBold, XBrushes.Black, new XRect(x, y, page.Width, page.Height), XStringFormats.TopCenter);
+            y += 30;
+
+            gfx.DrawString("Ativos", fontBold, XBrushes.Black, x, y);
+            y += 20;
+
+            var ativos = new Dictionary<string, List<BPRegistro>>()
+    {
+        {"Ativo Circulante", AtvCirculante},
+        {"Ativo não Circulante", AtvNCirculante}
+    };
+
+            foreach (var tabela in ativos)
             {
-                {"Ativos", ativos},
-                {"Passivos", passivos}
-            };
+                gfx.DrawString(tabela.Key, fontBold, XBrushes.Black, x, y);
+                y += 20;
 
-            return Document.Create(container =>
+                gfx.DrawString("Conta", fontBold, XBrushes.Black, x, y);
+                gfx.DrawString("Saldo", fontBold, XBrushes.Black, x + 300, y); 
+                y += 20;
+
+                foreach (var registro in tabela.Value)
+                {
+                    gfx.DrawString(registro.Conta, font, XBrushes.Black, x, y);
+                    gfx.DrawString($"{registro.Saldo:C}", font, XBrushes.Black, x + 300, y); 
+                    y += 20;
+                }
+
+                y += 10; 
+            }
+
+            gfx.DrawString("Passivos", fontBold, XBrushes.Black, x, y);
+            y += 20;
+
+            var passivos = new Dictionary<string, List<BPRegistro>>()
+    {
+        {"Passivo Circulante", PsvCirculante},
+        {"Passivo não Circulante", PsvNCirculante},
+        {"Patrimônio", Patrimonio}
+    };
+
+            foreach (var tabela in passivos)
             {
-                
+                gfx.DrawString(tabela.Key, fontBold, XBrushes.Black, x, y);
+                y += 20;
 
-                void CreateTableLegend(IContainer container)
+                gfx.DrawString("Conta", fontBold, XBrushes.Black, x, y);
+                gfx.DrawString("Saldo", fontBold, XBrushes.Black, x + 300, y);
+                y += 20;
+
+                foreach (var registro in tabela.Value)
                 {
-                    container
-                        .Table(table =>
-                        {
-                            table.ColumnsDefinition(columns =>
-                            {
-                                columns.RelativeColumn();
-                                columns.ConstantColumn(75);
-                            });
-                            table.Header(header =>
-                            {
-                                header.Cell().Element(PdfComponents.Header).Text("Conta").FontColor(PdfComponents.HeaderFColor);
-                                header.Cell().Element(PdfComponents.Header).Text("Saldo").FontColor(PdfComponents.HeaderFColor);
-                            });
-                        });
-                }
-                void CreateTableTotals(IContainer container, float total)
-                {
-                    container
-                        .Table(table =>
-                        {
-                            table.ColumnsDefinition(columns =>
-                            {
-                                columns.RelativeColumn();
-                                columns.ConstantColumn(75);
-                            });
-                            table.Header(header =>
-                            {
-                                header.Cell().Element(PdfComponents.Header).Text("Total:").FontColor(PdfComponents.HeaderFColor);
-                                header.Cell().Element(PdfComponents.Header).Text($"{total:C}").FontColor(PdfComponents.HeaderFColor);
-                            });
-                        });
+                    gfx.DrawString(registro.Conta, font, XBrushes.Black, x, y);
+                    gfx.DrawString($"{registro.Saldo:C}", font, XBrushes.Black, x + 300, y);
+                    y += 20; 
                 }
 
-                void CreateTable(IContainer container, KeyValuePair<string, List<BPRegistro>> tabela)
-                {
-                    container
-                        .Border(1)
-                        .Table(table =>
-                        {
-                            table.ColumnsDefinition(columns =>
-                            {
-                                columns.RelativeColumn();
-                                columns.ConstantColumn(75);
-                            });
-                            table.Header(header =>
-                            {
-                                header.Cell().ColumnSpan(2).Element(PdfComponents.TableHeader).Text(tabela.Key).FontColor(PdfComponents.TableHeaderFColor);
-                            });
-                            foreach(var registro  in tabela.Value)
-                            {
-                                registro.CreateCell(table);
-                            }
-                        });
-                }
+                y += 10; 
+            }
 
-                container.Page(page =>
-                {
-                    page.Header().Text("Balanço Patrimônial").AlignCenter();
-                    page.Content().Column(c =>
-                    {
-                        c.Item().Row(rowColumn =>
-                        {
-                            foreach(var coluna in colunas)
-                            {
-                                rowColumn.RelativeItem().Column(r =>
-                                {
-                                    r.Item().Element(PdfComponents.Header).Text(coluna.Key).FontColor(PdfComponents.HeaderFColor);
-                                    CreateTableLegend(r.Item());
-                                    foreach(var tabela in coluna.Value)
-                                    {
-                                        CreateTable(r.Item(), tabela);
-                                    }
-                                });
-                            }
-                        c.Item().Row(totais =>
-                            {
-                                CreateTableTotals(totais.RelativeItem(), TotalAtivo);
-                                CreateTableTotals(totais.RelativeItem(), TotalPassivo);
-                            });
-                        });
-                    });
-                });
-            });
+            y += 10; 
+
+            gfx.DrawString("Total Ativos:", fontBold, XBrushes.Black, x, y);
+            gfx.DrawString($"{TotalAtivo:C}", font, XBrushes.Black, x + 300, y);  
+            y += 20;
+
+            gfx.DrawString("Total Passivos:", fontBold, XBrushes.Black, x, y);
+            gfx.DrawString($"{TotalPassivo:C}", font, XBrushes.Black, x + 300, y); 
+            y += 20;
+
+            return pdfdoc;
         }
+
+
         #endregion
     }
     class BPRegistro
     {
         readonly public static Dictionary<short, string> rkey = new()
-        {
-            {0, "AtvCirculante"},
-            {1, "AtvNCirculante"},
-            {2, "PsvCirculante"},
-            {3, "PsvNCirculante"},
-            {4, "Patrimonio"}
-        };
+    {
+        {0, "AtvCirculante"},
+        {1, "AtvNCirculante"},
+        {2, "PsvCirculante"},
+        {3, "PsvNCirculante"},
+        {4, "Patrimonio"}
+    };
 
-        #region PDF
-        public void CreateCell(TableDescriptor table)
-        {
-            table.Cell().Element(PdfComponents.Cell).Text(this.Conta);
-            table.Cell().Element(PdfComponents.Cell).Text($"{this.Saldo:C}");
-        }
-        #endregion
-
-        public float Saldo;// { get; private set; }
+        public float Saldo; // { get; private set; }
         public string Conta { get; private set; } = "";
         public short RotuloKey { get; private set; }
         public string Rotulo { get; private set; } = "";
@@ -187,15 +166,23 @@ namespace ConTime.Classes
             this.RotuloKey = rotulokey;
             this.Rotulo = rkey[rotulokey];
         }
-        //Testar depois
+
         public BPRegistro(DataRow dr, short key)
         {
             float.TryParse(Convert.ToString(dr["saldo"]), out this.Saldo);
             this.Conta = Convert.ToString(dr["conta"]);
             this.RotuloKey = key;
             this.Rotulo = rkey[RotuloKey];
-
-            //MessageBox.Show($"{Rotulo}[{RotuloKey}]\t{Conta}: {Saldo}");
         }
+
+        #region PDF
+        public void CreateCell(XGraphics gfx, XFont font, double x, ref double y)
+        {
+            gfx.DrawString(this.Conta, font, XBrushes.Black, x, y);
+            gfx.DrawString($"{this.Saldo:C}", font, XBrushes.Black, x + 150, y);
+
+            y += 20; 
+        }
+        #endregion
     }
 }

@@ -1,8 +1,10 @@
-﻿using MySql.Data.MySqlClient;
+﻿using ConTime.Classes;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
@@ -15,7 +17,7 @@ namespace ConTime.Screens
 {
     public partial class Bal : UserControl
     {
-        DataSet DS = new DataSet();
+        public DataSet DS { get; private set; } = new DataSet();
         string tablename = "balancete";
         public Bal()
         {
@@ -28,8 +30,23 @@ namespace ConTime.Screens
             DT.Columns.Add("Credor");
             DT.Columns.Add("Saldo");
             dgv_bal.Columns["Conta"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            dgv_bal.DataSource = DS.Tables[tablename];
 
             ModificarDataGrid();
+        }
+        // Em Bal, antes de passar para Exer
+        public void PassarDadosParaExer()
+        {
+            // Verifique se os dados estão prontos
+            if (DS.Tables.Contains(tablename))
+            {
+                // Armazenar no DataStore
+                DataStore.BalanceteData = DS.Tables[tablename];
+            }
+            else
+            {
+                MessageBox.Show("Tabela não encontrada.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void btn_insert_Click(object sender, EventArgs e)
@@ -123,12 +140,18 @@ namespace ConTime.Screens
                     // Adiciona como um novo registro
                     AdicionarNovaLinha(codigo, conta, valorSaldo);
                 }
-                // Se o usuário clicar em Cancelar (DialogResult.Cancel), nada é feito
             }
             else if (!encontrouRegistroCompleto)
             {
                 // Se não encontrou nem parcialmente, adiciona uma nova linha
                 AdicionarNovaLinha(codigo, conta, valorSaldo);
+            }
+
+            // Atualiza o DataStore com os dados mais recentes
+            DataStore.BalanceteData.Clear(); // Limpa os dados antigos
+            foreach (DataRow row in DS.Tables[tablename].Rows)
+            {
+                DataStore.BalanceteData.ImportRow(row); // Adiciona as linhas do DataSet no DataStore
             }
 
             // Salva as mudanças
@@ -178,10 +201,57 @@ namespace ConTime.Screens
                     MessageBox.Show("Não se pode apagar linha vazia!");
         }
 
-        private void GerarPdf(object sender, EventArgs e)
+        public void GerarPdf(object sender, EventArgs e)
         {
-            Classes.Balancete ldia = new(DS.Tables[tablename]);
-            ldia.PdfCreate();
+            PdfBalancete();
+        }
+
+        public MemoryStream PdfBalancete()
+        {
+            // Certifique-se de que o DataTable existe
+            DataTable dtBalancete = DS.Tables[tablename];
+            MemoryStream pdfStream = null;
+
+            if (dtBalancete != null && dtBalancete.Rows.Count > 0)
+            {
+                // Cria a instância de Balancete e gera o PDF em memória
+                Classes.Balancete balancete = new Classes.Balancete(dtBalancete);
+                pdfStream = balancete.CreatePDF(); // Aqui retornamos o MemoryStream de CreatePDF
+
+                if (pdfStream != null)
+                {
+                    OpenPdfForViewing(pdfStream);  // Função que abre o PDF sem salvar fisicamente
+                }
+            }
+            else
+            {
+                MessageBox.Show("Não há dados para gerar o PDF do balancete.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            return pdfStream;
+        }
+
+        private void OpenPdfForViewing(MemoryStream pdfStream)
+        {
+            string tempFilePath = Path.Combine(Path.GetTempPath(), "Balancete.pdf");
+
+            try
+            {
+                // Escrever o conteúdo do MemoryStream para o arquivo temporário
+                using (FileStream fileStream = new FileStream(tempFilePath, FileMode.Create, FileAccess.Write))
+                {
+                    pdfStream.WriteTo(fileStream);
+                }
+
+                // Abrir o arquivo PDF com o programa associado no sistema
+                Process.Start(new ProcessStartInfo(tempFilePath)
+                {
+                    UseShellExecute = true // Isso abre o PDF no programa padrão do sistema
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao tentar abrir o PDF: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void btn_salvar_bal_Click(object sender, EventArgs e)
@@ -194,38 +264,60 @@ namespace ConTime.Screens
 
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    SalvarBalancete(saveFileDialog.FileName);
+                    SalvarBalancete();
                 }
             }
         }
 
-        private void SalvarBalancete(string filePath)
+        public void SalvarBalancete()
         {
-            try
+            DataTable balanceteData = DataStore.BalanceteData;
+
+            if (balanceteData == null || balanceteData.Rows.Count == 0)
             {
-                using (StreamWriter writer = new StreamWriter(filePath))
+                MessageBox.Show("Não há dados no balancete para salvar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+            {
+                saveFileDialog.Filter = "Arquivo CSV (*.csv)|*.csv";
+                saveFileDialog.Title = "Salvar Balancete";
+                saveFileDialog.DefaultExt = "csv";
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    writer.WriteLine("Código,Conta,Credor,Devedor,Saldo");
+                    string filePath = saveFileDialog.FileName;
 
-                    foreach (DataRow row in DS.Tables[tablename].Rows)
+                    try
                     {
-                        string codigo = row["Código"].ToString();
-                        string conta = row["Conta"].ToString();
-                        string credor = row["Credor"] != DBNull.Value ? Convert.ToDecimal(row["Credor"]).ToString("F2", CultureInfo.InvariantCulture) : "";
-                        string devedor = row["Devedor"] != DBNull.Value ? Convert.ToDecimal(row["Devedor"]).ToString("F2", CultureInfo.InvariantCulture) : "";
-                        string saldo = row["Saldo"] != DBNull.Value ? Convert.ToDecimal(row["Saldo"]).ToString("F2", CultureInfo.InvariantCulture) : "";
+                        using (StreamWriter writer = new StreamWriter(filePath))
+                        {
+                            writer.WriteLine("Código,Conta,Credor,Devedor,Saldo");
 
-                        writer.WriteLine($"{codigo},{conta},{credor},{devedor},{saldo}");
+                            foreach (DataRow row in balanceteData.Rows)
+                            {
+                                string codigo = row["Código"]?.ToString() ?? "";
+                                string conta = row["Conta"]?.ToString() ?? "";
+                                string credor = row["Credor"] != DBNull.Value ? Convert.ToDecimal(row["Credor"]).ToString("F2", CultureInfo.InvariantCulture) : "";
+                                string devedor = row["Devedor"] != DBNull.Value ? Convert.ToDecimal(row["Devedor"]).ToString("F2", CultureInfo.InvariantCulture) : "";
+                                string saldo = row["Saldo"] != DBNull.Value ? Convert.ToDecimal(row["Saldo"]).ToString("F2", CultureInfo.InvariantCulture) : "";
+
+                                writer.WriteLine($"{codigo},{conta},{credor},{devedor},{saldo}");
+                            }
+
+                            MessageBox.Show("Balancete salvo com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
                     }
-
-                    MessageBox.Show("Balancete salvo com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Erro ao salvar o balancete: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Erro ao salvar o balancete: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
         }
+
+
 
         private void ImportarBalancete(string filePath)
         {
@@ -254,7 +346,6 @@ namespace ConTime.Screens
 
                             if (linhaExistente != null)
                             {
-                                // Verifica se a linha é completa ou parcial
                                 bool codigoIgual = linhaExistente.Field<string>("Código") == codigo;
                                 bool contaIgual = linhaExistente.Field<string>("Conta") == conta;
 
@@ -270,21 +361,17 @@ namespace ConTime.Screens
 
                                 if (resultado == DialogResult.Yes)
                                 {
-                                    // Sobrescreve o registro existente
                                     if (credor.HasValue) linhaExistente["Credor"] = credor.Value.ToString("#.00");
                                     if (devedor.HasValue) linhaExistente["Devedor"] = devedor.Value.ToString("#.00");
                                     if (saldo.HasValue) linhaExistente["Saldo"] = saldo.Value.ToString("#.00");
                                 }
                                 else if (resultado == DialogResult.No)
                                 {
-                                    // Adiciona como novo registro
                                     AdicionarLinhaImportada(codigo, conta, credor, devedor, saldo);
                                 }
-                                // Se o usuário clicar em Cancelar (DialogResult.Cancel), nada é feito
                             }
                             else
                             {
-                                // Adiciona uma nova linha se não existir
                                 AdicionarLinhaImportada(codigo, conta, credor, devedor, saldo);
                             }
                         }

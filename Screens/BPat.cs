@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using ConTime.Classes;
 using MySql.Data.MySqlClient;
 using System.Xml.Linq;
+using System.Diagnostics;
 
 namespace ConTime.Screens
 {
@@ -32,7 +33,7 @@ namespace ConTime.Screens
 
             TablesInterface = new DataGridView[]
             {
-                AtvCirculante, AtvNCirculante, PsvCirculante, PsvNCirculante, Patrimonio
+        AtvCirculante, AtvNCirculante, PsvCirculante, PsvNCirculante, Patrimonio
             };
             TablesAtivos = new DataGridView[] { AtvCirculante, AtvNCirculante };
             TablesPassivos = new DataGridView[] { PsvCirculante, PsvNCirculante, Patrimonio };
@@ -46,8 +47,85 @@ namespace ConTime.Screens
                 TablesInterface[table.Key].Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
 
                 TablesInterface[table.Key].AllowUserToAddRows = true;
+
+                TablesInterface[table.Key].CellValueChanged += ContentUpdate;
+
             }
         }
+
+
+        private void EnviarDadosParaDataStore()
+        {
+            var balancoPatrimonial = new BalancoPatrimonialData();
+
+            foreach (DataGridView dgv in TablesAtivos)
+            {
+                foreach (DataGridViewRow row in dgv.Rows)
+                {
+                    if (!row.IsNewRow && row.Cells[0].Value != null && row.Cells[1].Value != null)
+                    {
+                        string conta = row.Cells[0].Value.ToString();
+                        float valor = 0;
+
+                        if (float.TryParse(row.Cells[1].Value.ToString(), out valor))
+                        {
+                            balancoPatrimonial.AdicionarDados("Ativos", conta, valor);
+                        }
+                    }
+                }
+            }
+
+            foreach (DataGridView dgv in TablesPassivos)
+            {
+                foreach (DataGridViewRow row in dgv.Rows)
+                {
+                    if (!row.IsNewRow && row.Cells[0].Value != null && row.Cells[1].Value != null)
+                    {
+                        string conta = row.Cells[0].Value.ToString();
+                        float valor = 0;
+
+                        if (float.TryParse(row.Cells[1].Value.ToString(), out valor))
+                        {
+                            balancoPatrimonial.AdicionarDados("Passivos", conta, valor);
+                        }
+                    }
+                }
+            }
+
+            foreach (DataGridView dgv in new DataGridView[] { Patrimonio })
+            {
+                foreach (DataGridViewRow row in dgv.Rows)
+                {
+                    if (!row.IsNewRow && row.Cells[0].Value != null && row.Cells[1].Value != null)
+                    {
+                        string conta = row.Cells[0].Value.ToString();
+                        float valor = 0;
+
+                        if (float.TryParse(row.Cells[1].Value.ToString(), out valor))
+                        {
+                            balancoPatrimonial.AdicionarDados("Patrimonio", conta, valor);
+                        }
+                    }
+                }
+            }
+
+            if (TAtivos != 0)
+            {
+                balancoPatrimonial.AdicionarDados("Ativos", "Total Ativo", TAtivos);
+            }
+
+            if (TPassivos != 0)
+            {
+                balancoPatrimonial.AdicionarDados("Passivos", "Total Passivo", TPassivos);
+            }
+
+            balancoPatrimonial.CalcularTotais();
+
+            DataStore.AdicionarBalancoPatrimonial(balancoPatrimonial);
+        }
+
+
+
 
         private void InitializeDataSet()
         {
@@ -71,12 +149,6 @@ namespace ConTime.Screens
             }
         }
 
-        private void PdfCreate(object sender, EventArgs e)
-        {
-            Classes.BPat bPat = new(ds, tb_Header.Text, TAtivos, TPassivos);
-            bPat.PdfCreate();
-        }
-
         private void ContentUpdate(object sender, DataGridViewCellEventArgs e)
         {
             DataGridView dgv = (DataGridView)sender;
@@ -84,7 +156,7 @@ namespace ConTime.Screens
             if (Array.IndexOf(TablesAtivos, dgv) != -1)
             {
                 int index = Array.IndexOf(TablesAtivos, dgv);
-                Ativos[index] = CalcularTotalSaldo(dgv);
+                Ativos[index] = CalcularTotalSaldo(dgv);  
                 AtualizarTotalAtivos();
             }
             else if (Array.IndexOf(TablesPassivos, dgv) != -1)
@@ -93,7 +165,10 @@ namespace ConTime.Screens
                 Passivos[index] = CalcularTotalSaldo(dgv);
                 AtualizarTotalPassivos();
             }
+
+            EnviarDadosParaDataStore();
         }
+
 
         private float CalcularTotalSaldo(DataGridView dgv)
         {
@@ -127,7 +202,7 @@ namespace ConTime.Screens
         }
 
 
-        private void SalvarBalanco()
+        public void SalvarBalanco()
         {
             string cabecario = tb_Header.Text;
 
@@ -185,12 +260,6 @@ namespace ConTime.Screens
             sw.WriteLine();
         }
 
-
-        private void btn_ImpBpat_Click(object sender, EventArgs e)
-        {
-            ImportarBalanco();
-        }
-
         private void LimparTabelas()
         {
             LimparTabela("AtvCirculante");
@@ -198,6 +267,12 @@ namespace ConTime.Screens
             LimparTabela("PsvCirculante");
             LimparTabela("PsvNCirculante");
             LimparTabela("Patrimonio");
+
+            TAtivos = 0;
+            TPassivos = 0;
+
+            lbl_TAtivos.Text = $"{TAtivos:C}";
+            lbl_TPassivos.Text = $"{TPassivos:C}";
         }
 
         private void LimparTabela(string nomeTabela)
@@ -205,8 +280,62 @@ namespace ConTime.Screens
             if (ds.Tables.Contains(nomeTabela))
             {
                 ds.Tables[nomeTabela].Rows.Clear();
+
+                var dgv = TablesInterface.FirstOrDefault(d => d.DataSource == ds.Tables[nomeTabela]);
+                if (dgv != null)
+                {
+                    dgv.Refresh(); 
+                }
+            }
+
+            if (nomeTabela == "AtvCirculante" || nomeTabela == "AtvNCirculante")
+            {
+                TAtivos = 0;
+                lbl_TAtivos.Text = $"{TAtivos:C}";
+            }
+            else if (nomeTabela == "PsvCirculante" || nomeTabela == "PsvNCirculante")
+            {
+                TPassivos = 0;
+                lbl_TPassivos.Text = $"{TPassivos:C}";
             }
         }
+
+
+        private void LimparPaineis()
+        {
+            foreach (Control painel in this.Controls)
+            {
+                if (painel is Panel painelControle) 
+                {
+                    foreach (Control controle in painelControle.Controls) 
+                    {
+                        if (controle is DataGridView dgv) 
+                        {
+                            if (dgv.IsCurrentCellInEditMode)
+                            {
+                                dgv.EndEdit();
+                            }
+
+                            dgv.Rows.Clear();
+                        }
+                    }
+                }
+            }
+
+            tb_Header.Clear();
+
+            TAtivos = 0;
+            TPassivos = 0;
+
+            lbl_TAtivos.Text = $"{TAtivos:C}";
+            lbl_TPassivos.Text = $"{TPassivos:C}";
+
+            Array.Clear(Ativos, 0, Ativos.Length);
+            Array.Clear(Passivos, 0, Passivos.Length);
+        }
+
+
+
 
         private void ImportarBalanco()
         {
@@ -248,6 +377,69 @@ namespace ConTime.Screens
                         if (sr != null) sr.Close();
                     }
                 }
+            }
+        }
+
+        public MemoryStream PdfGeral(List<Conta> ativos, List<Conta>passivos, List<Conta>patrimonio)
+        {
+            MemoryStream pdfStream = null;
+
+            Classes.BPat balanco = new Classes.BPat(ds, tb_Header.Text, TAtivos, TPassivos);
+            pdfStream = balanco.PdfCreate();
+
+            if (pdfStream != null)
+            {
+                OpenPdfForViewing(pdfStream);
+            }
+            else
+            {
+                MessageBox.Show("Erro ao gerar o PDF do Balanço Patrimonial.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            return pdfStream;
+
+            EnviarDadosParaDataStore();
+        }
+        public MemoryStream PdfBalanço()
+        {
+            MemoryStream pdfStream = null;
+
+            Classes.BPat balanco = new Classes.BPat(ds, tb_Header.Text, TAtivos, TPassivos);
+            pdfStream = balanco.PdfCreate();
+
+            if (pdfStream != null)
+            {
+                OpenPdfForViewing(pdfStream);
+            }
+            else
+            {
+                MessageBox.Show("Erro ao gerar o PDF do Balanço Patrimonial.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            return pdfStream;
+
+            EnviarDadosParaDataStore();
+        }
+
+        private void OpenPdfForViewing(MemoryStream pdfStream)
+        {
+            string tempFilePath = Path.Combine(Path.GetTempPath(), "Balanço Patrimonial.pdf");
+
+            try
+            {
+                using (FileStream fileStream = new FileStream(tempFilePath, FileMode.Create, FileAccess.Write))
+                {
+                    pdfStream.WriteTo(fileStream);
+                }
+
+                Process.Start(new ProcessStartInfo(tempFilePath)
+                {
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao tentar abrir o PDF: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -300,49 +492,25 @@ namespace ConTime.Screens
             }
         }
 
-        private void AtvCirculante_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void btn_salvar_bpat_Click_1(object sender, EventArgs e)
         {
+            SalvarBalanco();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            ImportarBalanco();
 
         }
 
-        private void PsvCirculante_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void button1_Click(object sender, EventArgs e)
         {
-
+            PdfBalanço();
         }
 
-        private void panel7_Paint(object sender, PaintEventArgs e)
+        private void button3_Click(object sender, EventArgs e)
         {
-
-        }
-
-        private void AtvNCirculante_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private void panel10_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        private void label7_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void Patrimonio_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private void splitContainer7_Panel1_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        private void label3_Click(object sender, EventArgs e)
-        {
-
+            LimparTabelas();
         }
     }
 }

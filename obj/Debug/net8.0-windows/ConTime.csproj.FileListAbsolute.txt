@@ -527,3 +527,8 @@ C:\Users\Lucas\Source\Repos\contime-contabilidade\obj\Debug\net8.0-windows\refin
 C:\Users\Lucas\Source\Repos\contime-contabilidade\obj\Debug\net8.0-windows\ConTime.pdb
 C:\Users\Lucas\Source\Repos\contime-contabilidade\obj\Debug\net8.0-windows\ConTime.genruntimeconfig.cache
 C:\Users\Lucas\Source\Repos\contime-contabilidade\obj\Debug\net8.0-windows\ref\ConTime.dll
+C:\Users\Lucas\Source\Repos\contime-contabilidade\bin\Debug\net8.0-windows\PdfSharpCore.dll
+C:\Users\Lucas\Source\Repos\contime-contabilidade\bin\Debug\net8.0-windows\ICSharpCode.SharpZipLib.dll
+C:\Users\Lucas\Source\Repos\contime-contabilidade\bin\Debug\net8.0-windows\SixLabors.Fonts.dll
+C:\Users\Lucas\Source\Repos\contime-contabilidade\bin\Debug\net8.0-windows\SixLabors.ImageSharp.dll
+C:\Users\Lucas\Source\Repos\contime-contabilidade\bin\Debug\net8.0-windows\de\PdfSharpCore.resources.dll

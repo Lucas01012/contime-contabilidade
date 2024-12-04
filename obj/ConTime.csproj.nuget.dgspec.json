@@ -53,6 +53,10 @@
               "target": "Package",
               "version": "[8.4.0, )"
             },
+            "PdfSharpCore": {
+              "target": "Package",
+              "version": "[1.3.65, )"
+            },
             "QuestPDF": {
               "target": "Package",
               "version": "[2024.3.4, )"

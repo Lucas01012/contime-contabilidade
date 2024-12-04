@@ -22,15 +22,17 @@ namespace ConTime.Screens
         public DataGridView dgv1; // Adicionando o primeiro DataGridView
         public DataGridView dgv2; // Adicionando o segundo DataGridView
         public Label header; // Adicionando o cabeçalho
+        public String RazoneteHeader { get; set; }
 
-
-        public TextBox txtHeader;
+        public TextBox txtHeader { get; set; }
         private Panel panelRazonetes;
         private Button btnAddRazo;
         private Razonete razonete;
 
+
         public int PositionIndex { get; set; }
         public bool IsDeleted { get; set; } = false;
+
         public Razo(string cabecalho)
         {
             InitializeComponent();
@@ -40,10 +42,82 @@ namespace ConTime.Screens
             InitializePanel();
             InitializeCustomComponents(); // Inicializa os componentes personalizados
         }
+        public object ObterDadosParaEnvio()
+        {
+            // Cria uma lista para armazenar os dados dos registros
+            var registros = new List<object>();
+
+            // Itera sobre todas as linhas da tabela de "Razo_Linhas"
+            foreach (DataRow row in ds.Tables[linhasname].Rows)
+            {
+                // Extrai os valores de débito e crédito
+                decimal debito = row.Field<decimal>("Debito");
+                decimal credito = row.Field<decimal>("Credito");
+
+                // Adiciona os dados de cada linha à lista de registros
+                registros.Add(new
+                {
+                    Debito = debito,
+                    Credito = credito
+                });
+            }
+
+            // Retorna os dados como um objeto anônimo com o cabeçalho e os registros
+            return new
+            {
+                Cabecalho = this.RazoneteHeader,  // Cabeçalho do razonete
+                Registros = registros            // Lista de registros (débito e crédito)
+            };
+        }
+
+
+        private void InitializeHeader(string cabecalho)
+        {
+            // Verifica se o txtHeader ainda não foi inicializado
+            if (txtHeader == null)
+            {
+                txtHeader = new TextBox
+                {
+                    Name = "txtHeader",
+                    Location = new System.Drawing.Point(10, 10),  // Posição no painel
+                    Size = new System.Drawing.Size(200, 20),      // Tamanho do TextBox
+                    Text = cabecalho  // Passa o cabeçalho inicial
+                };
+
+                // Adiciona o TextBox ao controle (supondo que você tenha um painel ou algo onde adicionar)
+                this.Controls.Add(txtHeader);
+
+                // Registra o evento de alteração do texto para atualizar a propriedade RazoneteHeader
+                txtHeader.TextChanged += (sender, e) =>
+                {
+                    RazoneteHeader = txtHeader.Text;  // Atualiza a propriedade com o valor do texto
+                };
+            }
+        }
+
+        public void SetCabecalho(string cabecalhoTexto)
+        {
+            if (Header != null)
+            {
+                Header.Text = cabecalhoTexto;
+            }
+        }
+
+        public string SalvarHeader()
+        {
+            return Header.Text;
+        }
+        private void TxtHeader_TextChanged(object sender, EventArgs e)
+        {
+            string cabecalho = txtHeader.Text;
+
+            this.RazoneteHeader = cabecalho;
+
+        }
 
         private void InitializeCustomComponents()
         {
-            // Inicialização do primeiro DataGridView
+            // Inicialização do DataGridView1
             dgv1 = new DataGridView
             {
                 Anchor = (AnchorStyles.Top | AnchorStyles.Left),
@@ -58,7 +132,7 @@ namespace ConTime.Screens
                 ScrollBars = ScrollBars.Vertical
             };
 
-            // Inicialização do segundo DataGridView
+            // Inicialização do DataGridView2 (o dgv_result)
             dgv2 = new DataGridView
             {
                 Anchor = (AnchorStyles.Top | AnchorStyles.Left),
@@ -73,14 +147,16 @@ namespace ConTime.Screens
                 ScrollBars = ScrollBars.Vertical
             };
 
+            dataGridView1.KeyPress += DataGridView1_KeyPress;
+            dataGridView1.DataError += DataGridView1_DataError;
             // Inicialização do cabeçalho
             header = new Label
             {
                 Text = "Cabeçalho Ajustado",
                 Font = new Font("Arial", 12, FontStyle.Bold),
                 BackColor = Color.LightBlue,
-                Location = new Point(10, 5), // Ajuste conforme necessário
-                Size = new Size(200, 30) // Ajuste conforme necessário
+                Location = new Point(10, 5),
+                Size = new Size(200, 30)
             };
 
             // Adicionando os componentes ao controle
@@ -88,6 +164,37 @@ namespace ConTime.Screens
             this.Controls.Add(dgv2);
             this.Controls.Add(header);
         }
+
+        private void DataGridView1_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            // Verifica se a célula editada é a coluna "Débito" ou "Crédito"
+            if (dataGridView1.CurrentCell.OwningColumn.Name == "Débito" || dataGridView1.CurrentCell.OwningColumn.Name == "Crédito")
+            {
+                // Se a tecla pressionada não for um número, backspace ou ponto
+                if (!char.IsDigit(e.KeyChar) && e.KeyChar != (char)8 && e.KeyChar != '.')
+                {
+                    // Cancela a ação de inserção
+                    e.Handled = true;
+
+                    // Exibe uma mensagem de erro
+                    MessageBox.Show("Por favor, insira apenas números ou um ponto (.) para valores decimais.", "Erro de entrada", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+        private void DataGridView1_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            // Verifica se o erro está relacionado ao valor digitado
+            if (e.Exception is FormatException)
+            {
+                // Impede a exibição da caixa de diálogo padrão
+                e.Cancel = true;
+
+                // Exibe uma mensagem de erro personalizada
+                MessageBox.Show("Por favor, insira apenas números válidos.", "Erro de entrada", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
         public void ReapplyDataGridViewSettings()
         {
             dataGridView1.AllowUserToResizeColumns = false;
@@ -116,32 +223,15 @@ namespace ConTime.Screens
         {
             _parentRazonete = parentRazonete ?? throw new ArgumentNullException(nameof(_parentRazonete));
         }
-        private void InitializeHeader(string cabecalho)
-        {
-            txtHeader = new TextBox
-            {
-                Name = "txtHeader",
-                Location = new System.Drawing.Point(10, 10),
-                Size = new System.Drawing.Size(200, 20),
-                Text = cabecalho // Este valor deve ser o que você quer exibir como o texto inicial
-            };
 
-            // Se você está usando um placeholder, isso será exibido quando o campo estiver vazio:
-            txtHeader.PlaceholderText = "Digite o cabeçalho aqui..."; // Isso é apenas o placeholder, não o valor real
-            this.Controls.Add(txtHeader);
-        }
 
         public void AtualizarCabecalho(string novoCabecalho)
         {
             txtHeader.Text = novoCabecalho;
-            
+
 
         }
 
-        public string GetCabecalho()
-        {
-            return txtHeader.Text; // Garanta que está pegando o texto real aqui
-        }
 
         private void InitializePanel()
         {
@@ -306,11 +396,6 @@ namespace ConTime.Screens
             return new Classes.Razo(ds, txtHeader.Text);
         }
 
-        public void SetCabecalho(string cabecalho)
-        {
-            txtHeader.Text = cabecalho;
-        }
-
         public void AddRegistro(decimal debito, decimal credito)
         {
             DataRow newRow = ds.Tables[linhasname].NewRow();
@@ -366,10 +451,10 @@ namespace ConTime.Screens
             Header.Font = new Font("YU Gothic UI", 12, FontStyle.Bold);
             Header.ForeColor = Color.White;
 
-            button1.FlatStyle = FlatStyle.Flat;          
-            button1.FlatAppearance.BorderSize = 0;           
-            button1.BackColor = Color.Transparent;            
-            button1.ForeColor = Color.Black;                  
+            button1.FlatStyle = FlatStyle.Flat;
+            button1.FlatAppearance.BorderSize = 0;
+            button1.BackColor = Color.Transparent;
+            button1.ForeColor = Color.Black;
             button1.TextAlign = ContentAlignment.MiddleCenter;
 
             foreach (DataGridViewColumn column in dataGridView1.Columns)
@@ -380,13 +465,12 @@ namespace ConTime.Screens
             dataGridView1.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
         }
 
-
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
 
         }
 
-        private void dgv_result_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void Header_TextChanged(object sender, EventArgs e)
         {
 
         }

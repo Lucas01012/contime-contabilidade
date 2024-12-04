@@ -1,129 +1,115 @@
-﻿using System;
+﻿using ConTime.Screens;
+using PdfSharpCore.Drawing;
+using PdfSharpCore.Pdf;
+using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MySqlX.XDevAPI.Relational;
-using QuestPDF.Fluent;
-using QuestPDF.Infrastructure;
-
-using ConTime.PersonalizedComponents;
+using System.IO;
 
 namespace ConTime.Classes
 {
-
-    internal class Razonetes
+    public class Razonetes
     {
-
-        string cabecario = "Lorem Ipsum";
-        string id;
-        List<Razo> razonetes = new();
+        public string id;
+        string cabecario = "Lorem Ipsu";
+        public  List<Razo> razonetes = new();
+        private List<Razo> _razos;
 
         public void AddRazonete(Razo razonete)
         {
             razonetes.Add(razonete);
         }
+
         #region PDF
-        public void PdfCreate()
+        public MemoryStream CreatePDF()
         {
-            var pdfdoc = CreatePDF();
-            pdfdoc.GeneratePdfAndShow();
-        }
-        private Document CreatePDF()
-        {
-            string
-                HeaderBGColor = "#000000", HeaderFColor = "#ffffff",
-                LabelBGColor = "#aaaaaa", LabelFColor = "#000000", LabelBorderColor = "#666666",
-                CellBGColor = "#ffffff", CellFColor = "#000000";
+            var pdfStream = new MemoryStream();
+            PdfDocument pdfDoc = new PdfDocument();
 
-            /*void CreateTable(IContainer container, Razo razo)
+            PdfPage page = pdfDoc.AddPage();
+            XGraphics gfx = XGraphics.FromPdfPage(page);
+
+            int margin = 20;
+            int yPos = margin;
+            int xPos = margin;
+            int pageHeight = (int)page.Height.Point;
+            int pageWidth = (int)page.Width.Point;
+            int razoneteWidth = (pageWidth - 5 * margin) / 4;
+            int maxRazoneteHeight = 0;
+            int count = 0;
+
+
+
+            foreach (var razonete in razonetes)
             {
-                container
-                        .Border(1).BorderColor("#000000")
-                        .Table(t =>
-                        {
-                            void addcell(string? value) => t.Cell().Border(1).BorderColor("#000000").Background(CellBGColor).Text(value).FontColor(CellFColor).AlignCenter();
-                            void addlabel(string? value) => t.Cell().ColumnSpan(2).Border(1).BorderColor(LabelBorderColor).Background(LabelBGColor).Text(value).FontColor(LabelFColor);
-                            void addempty() => t.Cell().ColumnSpan(2).Border(1).BorderColor("#000000").Background(CellBGColor);
+                int razoneteHeight = razonete.GetHeight(gfx, razoneteWidth);
+                maxRazoneteHeight = Math.Max(maxRazoneteHeight, razoneteHeight);
 
-                            t.ColumnsDefinition(columns =>
-                            {
-                                columns.RelativeColumn();
-                                columns.RelativeColumn();
-
-                            });
-                            t.Header(header =>
-                            {
-                                header.Cell().ColumnSpan(2).BorderColor("#ffffff").Background(HeaderBGColor).Text(razo.Header).FontColor(HeaderFColor).AlignCenter();
-                                header.Cell().ColumnSpan(1).Border(1).BorderColor("#ffffff").Background(HeaderBGColor).Text("Debito").FontColor(HeaderFColor);
-                                header.Cell().ColumnSpan(1).Border(1).BorderColor("#ffffff").Background(HeaderBGColor).Text("Credito").FontColor(HeaderFColor);
-                            });
-
-                            foreach (Razo.RazoRegistro linha in razo.registros)
-                            {
-                                addcell($"{linha.debito:C}");
-                                addcell($"{linha.credito:C}");
-                            }
-                            t.Footer(footer =>
-                            {
-                                footer.Cell().ColumnSpan(1).Border(1).BorderColor("#000000").Background(HeaderBGColor).Text($"{razo.totalD:C}").FontColor(HeaderFColor).AlignCenter();
-                                footer.Cell().ColumnSpan(1).Border(1).BorderColor("#000000").Background(HeaderBGColor).Text($"{razo.totalC:C}").FontColor(HeaderFColor).AlignCenter();
-                            });
-                        });
-            }*/
-            return Document.Create(container =>
-            {
-                container.Page(page => //Eu sinceramente não entendo como paginas funcionam // Eu Agora entendo mais ou menos
+                if (count > 0 && count % 4 == 0)
                 {
-                    page.Content().Column(c => //Confusão mental
-                    {
-                        int count = razonetes.Count;
-                        int footerCount = count;
-                        int rounds = (int)Math.Ceiling((double)(count / 4f));
-                        int index = 0;
-                        int footerIndex = index;
-                        for (var i = 0; i < rounds; i++)
-                        {
-                            c.Item().Height(10);
-                            c.Item().Row(rowColumn => //Coluna que contem os Razonetes
-                            {
-                                for (var j = 0; j < 4 && count != 0; j++)
-                                {
-                                    count--;
-                                    rowColumn.ConstantItem(10);
-                                    rowColumn.ConstantItem(136).Border(1).Background(PdfComponents.TableHeaderBGColor).Column(row => //Linha da coluna que contém o cabeçalho, a tabela e os totais
-                                    {
-                                        razonetes[index].CreateHeader(row.Item().Background(HeaderFColor));
-                                        razonetes[index].CreateTable(row.Item());
-                                    });
-                                    index++;
-                                }
-                                rowColumn.ConstantItem(10);
-                            });
-                            c.Item().Row(rowColumn => //Coluna que contem os Razonetes
-                            {
-                                for (var j = 0; j < 4 && footerCount != 0; j++)
-                                {
-                                    footerCount--;
-                                    rowColumn.ConstantItem(10);
-                                    rowColumn.ConstantItem(136).Column(row => //Linha da coluna que contém o cabeçalho, a tabela e os totais
-                                    {
-                                        razonetes[footerIndex].CreateTableTotals(row.Item());
-                                    });
-                                    footerIndex++;
-                                }
-                                rowColumn.ConstantItem(10);
-                            });
-                        }
+                    yPos += maxRazoneteHeight + margin;
+                    xPos = margin;
+                    maxRazoneteHeight = razoneteHeight;
 
-                    });
-                });
-            });
+                    if (yPos + razoneteHeight > pageHeight - margin)
+                    {
+                        page = pdfDoc.AddPage();
+                        gfx = XGraphics.FromPdfPage(page);
+                        yPos = margin;
+                    }
+                }
+
+                gfx.DrawRectangle(XPens.Black, xPos, yPos, razoneteWidth, razoneteHeight);
+                gfx.DrawString(razonete.Header, new XFont("Helvetica", 12, XFontStyle.Bold), XBrushes.Black, new XRect(xPos + 5, yPos + 5, razoneteWidth, 20), XStringFormats.TopLeft);
+                razonete.CreateTable(gfx, xPos + 5, yPos + 30, razoneteWidth - 10);
+
+                xPos += razoneteWidth + margin;
+                count++;
+            }
+
+            pdfDoc.Save(pdfStream, false);
+            pdfStream.Position = 0;
+            
+
+            return pdfStream;
         }
+
+        public MemoryStream PdfCreate()
+        {
+            // Gera o PDF e obtém o MemoryStream
+            var pdfStream = CreatePDF();
+
+            // Retorna o MemoryStream gerado
+            return pdfStream;
+        }
+
+
+        public void VisualizarPDF(MemoryStream pdfStream)
+        {
+            if (pdfStream == null || pdfStream.Length == 0)
+            {
+                MessageBox.Show("Erro ao gerar o PDF. O stream está vazio.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            string tempFilePath = Path.Combine(Path.GetTempPath(), "tempRazonetes.pdf");
+            File.WriteAllBytes(tempFilePath, pdfStream.ToArray());
+
+            var startInfo = new System.Diagnostics.ProcessStartInfo(tempFilePath)
+            {
+                UseShellExecute = true
+            };
+            System.Diagnostics.Process.Start(startInfo);
+            #endregion
+        }
+        public void CarregarDados(List<Razo> razos)
+        {
+            _razos = razos;  // Armazena a lista de razonetes
+        }
+
+
     }
-    #endregion
+
     public class Razo
     {
         public string razoid;
@@ -131,62 +117,10 @@ namespace ConTime.Classes
         public List<RazoRegistro> registros = new();
         internal float totalD;
         internal float totalC;
-        private DataSet ds;
-        private TextBox header;
-        #region Pdf
-        public void CreateHeader(IContainer container)
-        {
-            container
-                .Border(1)
-                .Text(Header)
-                .AlignCenter();
-        }
-        public void CreateTable(IContainer container)
-        {
-            container
-                        .Border(1).BorderColor("#000000")
-                        .Table(table =>
-                        {
-                            table.ColumnsDefinition(columns =>
-                            {
-                                columns.RelativeColumn();
-                                columns.RelativeColumn();
-                            });
-                            table.Header(header =>
-                            {
-                                header.Cell().Element(PdfComponents.Header).Text("Debito").FontColor(PdfComponents.HeaderFColor);
-                                header.Cell().Element(PdfComponents.Header).Text("Credito").FontColor(PdfComponents.HeaderFColor);
-                            });
-                            foreach(var registro in registros)
-                            {
-                                registro.CreateCell(table);
-                            }
-                        });
-        }
-        public void CreateTableTotals(IContainer container)
-        {
-            container
-                .Border(1)
-                .Table(table =>
-                {
-                    table.ColumnsDefinition(columns =>
-                    {
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                    });
-                    table.Header(header =>
-                    {
-                        header.Cell().Element(PdfComponents.Header).Text($"{totalD:C}").FontColor(PdfComponents.HeaderFColor);
-                        header.Cell().Element(PdfComponents.Header).Text($"{totalC:C}").FontColor(PdfComponents.HeaderFColor);
-                    });
-                });
-        }
-        #endregion
 
-     
-        public Razo(DataSet ds, String Cabecario)
+        public Razo(DataSet ds, string cabecario)
         {
-            Header = Cabecario;
+            Header = cabecario;
             DataTable dt = ds.Tables[Screens.Razo.tablename];
             DataTable dl = ds.Tables[Screens.Razo.linhasname];
 
@@ -200,34 +134,133 @@ namespace ConTime.Classes
 
             if (dt.Rows.Count > 0)
             {
-                DataRow? totais = dt.Rows[0];
-                float.TryParse(Convert.ToString(totais["Total_Debito"]), out this.totalD);
-                float.TryParse(Convert.ToString(totais["Total_Credito"]), out this.totalC);
+                DataRow totais = dt.Rows[0];
+                float.TryParse(Convert.ToString(totais["Total_Debito"]), out totalD);
+                float.TryParse(Convert.ToString(totais["Total_Credito"]), out totalC);
+            }
+        }
+        public void CreateTableTotals(XGraphics gfx, int xPos, int yPos, int width)
+        {
+            int rowHeight = 20;
+            int columnWidth = width / 2;
+
+            // Desenhar o cabeçalho dos totais (rótulos)
+            gfx.DrawString("Total Débito",
+                new XFont("Helvetica", 10, XFontStyle.Bold),
+                XBrushes.Black,
+                new XRect(xPos + 5, yPos, columnWidth - 10, rowHeight),
+                XStringFormats.TopLeft);
+
+            gfx.DrawString("Total Crédito",
+                new XFont("Helvetica", 10, XFontStyle.Bold),
+                XBrushes.Black,
+                new XRect(xPos + columnWidth + 5, yPos, columnWidth - 10, rowHeight),
+                XStringFormats.TopLeft);
+
+            // Desenhar linha horizontal abaixo das labels de totais
+            gfx.DrawLine(XPens.Black, xPos, yPos + rowHeight, xPos + width, yPos + rowHeight);
+
+            // Desenhar os valores dos totais
+            yPos += rowHeight; // Avançar para a linha dos valores
+            gfx.DrawString(
+                totalD.ToString("C"),
+                new XFont("Helvetica", 10, XFontStyle.Bold),
+                XBrushes.Black,
+                new XRect(xPos + 5, yPos, columnWidth - 10, rowHeight),
+                XStringFormats.TopLeft);
+
+            gfx.DrawString(
+                totalC.ToString("C"),
+                new XFont("Helvetica", 10, XFontStyle.Bold),
+                XBrushes.Black,
+                new XRect(xPos + columnWidth + 5, yPos, columnWidth - 10, rowHeight),
+                XStringFormats.TopLeft);
+
+            // Desenhar linha vertical que separa os dois valores
+            gfx.DrawLine(XPens.Black, xPos + columnWidth, yPos - rowHeight, xPos + columnWidth, yPos + rowHeight);
+
+            // Desenhar contorno ao redor dos totais
+            gfx.DrawRectangle(
+                XPens.Black,
+                xPos,           // Linha começa na borda esquerda do painel
+                yPos - rowHeight, // Parte superior do cabeçalho dos totais
+                width,          // Largura total do painel
+                rowHeight * 2); // Altura total dos dois totais (rótulo + valores)
+        }
+
+        public void CreateTable(XGraphics gfx, int xPos, int yPos, int width)
+        {
+            int rowHeight = 20;
+            int currentY = yPos;
+            int columnWidth = width / 2;
+
+            // Cabeçalho das colunas
+            gfx.DrawRectangle(XPens.Black, xPos, currentY, width, rowHeight);
+            gfx.DrawString("Débito", new XFont("Helvetica", 10, XFontStyle.Bold), XBrushes.Black, new XRect(xPos + 5, currentY + 5, columnWidth, rowHeight), XStringFormats.TopLeft);
+            gfx.DrawString("Crédito", new XFont("Helvetica", 10, XFontStyle.Bold), XBrushes.Black, new XRect(xPos + columnWidth + 5, currentY + 5, columnWidth, rowHeight), XStringFormats.TopLeft);
+            currentY += rowHeight;
+
+            // Adicionar registros
+            foreach (var registro in registros)
+            {
+                gfx.DrawRectangle(XPens.Black, xPos, currentY, width, rowHeight);
+                gfx.DrawString(registro.debito.ToString("C"), new XFont("Helvetica", 10), XBrushes.Black, new XRect(xPos + 5, currentY + 5, columnWidth, rowHeight), XStringFormats.TopLeft);
+                gfx.DrawString(registro.credito.ToString("C"), new XFont("Helvetica", 10), XBrushes.Black, new XRect(xPos + columnWidth + 5, currentY + 5, columnWidth, rowHeight), XStringFormats.TopLeft);
+                currentY += rowHeight;
             }
 
+            // Adicionar espaço para totais dentro do razonete
+            currentY += 5; // Pequeno espaço antes dos totais
+
+            // Adicionar os totais ao final (dentro do razonete)
+            CreateTableTotals(gfx, xPos, currentY, width);
         }
 
-        public Razo(DataSet ds, TextBox header)
+        public void CreatePanel(XGraphics gfx, int xPos, int yPos, int width)
         {
-            this.ds = ds;
-            this.header = header;
+            int rowHeight = 20;
+
+            // Desenha o restante do conteúdo dentro do painel
+            CreateTable(gfx, xPos + 5, yPos + 30, width - 10);
+
+            // Ajuste a altura do painel para incluir os totais e o cabeçalho
+            int razoneteHeight = GetHeight(gfx, width);
+
+            // Desenhar o painel completo com a altura correta por último
+            gfx.DrawRectangle(XPens.Black, xPos, yPos, width, razoneteHeight);
+
+            // Adicionar o cabeçalho
+            gfx.DrawString(Header,
+                new XFont("Helvetica", 12, XFontStyle.Bold),
+                XBrushes.Black,
+                new XRect(xPos + 5, yPos + 5, width - 10, 20),
+                XStringFormats.TopLeft);
         }
+
+        public int GetHeight(XGraphics gfx, int width)
+        {
+            int rowHeight = 20;       // Altura de cada linha
+            int headerHeight = 30;    // Altura fixa do cabeçalho
+            int totalHeight = rowHeight * 2; // Altura para os dois totais
+
+            // Altura total: cabeçalho + registros + totais
+            int height = headerHeight + (registros.Count * rowHeight) + totalHeight + 35; // Ajuste para incluir o espaço do cabeçalho
+
+            return height;
+        }
+
+
+
 
         public class RazoRegistro
         {
             public float debito;
             public float credito;
-            #region Pdf
-            public void CreateCell(TableDescriptor table)
-            {
-                table.Cell().Element(PdfComponents.Cell).Text($"{debito:C}");
-                table.Cell().Element(PdfComponents.Cell).Text($"{credito:C}");
-            }
-            #endregion
+
             public RazoRegistro(DataRow dr)
             {
-                float.TryParse(Convert.ToString(dr["Debito"]), out this.debito);
-                float.TryParse(Convert.ToString(dr["Credito"]), out this.credito);
+                float.TryParse(Convert.ToString(dr["Debito"]), out debito);
+                float.TryParse(Convert.ToString(dr["Credito"]), out credito);
             }
         }
     }
