@@ -16,7 +16,7 @@ namespace ConTime.Screens
     public partial class BPat : UserControl
     {
         Classes.BPat balanco;
-        DataSet ds = new();
+        DataSet ds = DataStore.BalancoPatrimonialData ?? new DataSet("BalancoPatrimonial");
         public readonly static string tablename = "balanco_patrimonial";
         DataGridView[] TablesInterface;
         DataGridView[] TablesAtivos;
@@ -25,6 +25,21 @@ namespace ConTime.Screens
         float TAtivos = 0;
         float[] Passivos = new float[3];
         float TPassivos = 0;
+
+        private DataTable _atvCirculante;
+        private DataTable _atvNCirculante;
+        private DataTable _psvCirculante;
+        private DataTable _psvNCirculante;
+        private DataTable _patrimonio;
+
+        public BPat(DataTable atvCirculante, DataTable atvNCirculante, DataTable psvCirculante, DataTable psvNCirculante, DataTable patrimonio)
+        {
+            _atvCirculante = atvCirculante;
+            _atvNCirculante = atvNCirculante;
+            _psvCirculante = psvCirculante;
+            _psvNCirculante = psvNCirculante;
+            _patrimonio = patrimonio;
+        }
 
         public BPat()
         {
@@ -48,83 +63,17 @@ namespace ConTime.Screens
 
                 TablesInterface[table.Key].AllowUserToAddRows = true;
 
+                TablesInterface[table.Key].CellValueChanged += SalvarDadosEmTempoReal;
                 TablesInterface[table.Key].CellValueChanged += ContentUpdate;
 
+                // Configurações de estilo conforme a DRE
+                TablesInterface[table.Key].DefaultCellStyle.SelectionForeColor = Color.FromArgb(29, 61, 48); // Cor da fonte da célula selecionada
+                TablesInterface[table.Key].DefaultCellStyle.SelectionBackColor = Color.White; // Cor de fundo da célula selecionada para branco
+                TablesInterface[table.Key].Font = new Font("Yu Gothic UI", 12, FontStyle.Bold);
             }
+
+            DataStore.BalancoPatrimonialData = ds;
         }
-
-
-        private void EnviarDadosParaDataStore()
-        {
-            var balancoPatrimonial = new BalancoPatrimonialData();
-
-            foreach (DataGridView dgv in TablesAtivos)
-            {
-                foreach (DataGridViewRow row in dgv.Rows)
-                {
-                    if (!row.IsNewRow && row.Cells[0].Value != null && row.Cells[1].Value != null)
-                    {
-                        string conta = row.Cells[0].Value.ToString();
-                        float valor = 0;
-
-                        if (float.TryParse(row.Cells[1].Value.ToString(), out valor))
-                        {
-                            balancoPatrimonial.AdicionarDados("Ativos", conta, valor);
-                        }
-                    }
-                }
-            }
-
-            foreach (DataGridView dgv in TablesPassivos)
-            {
-                foreach (DataGridViewRow row in dgv.Rows)
-                {
-                    if (!row.IsNewRow && row.Cells[0].Value != null && row.Cells[1].Value != null)
-                    {
-                        string conta = row.Cells[0].Value.ToString();
-                        float valor = 0;
-
-                        if (float.TryParse(row.Cells[1].Value.ToString(), out valor))
-                        {
-                            balancoPatrimonial.AdicionarDados("Passivos", conta, valor);
-                        }
-                    }
-                }
-            }
-
-            foreach (DataGridView dgv in new DataGridView[] { Patrimonio })
-            {
-                foreach (DataGridViewRow row in dgv.Rows)
-                {
-                    if (!row.IsNewRow && row.Cells[0].Value != null && row.Cells[1].Value != null)
-                    {
-                        string conta = row.Cells[0].Value.ToString();
-                        float valor = 0;
-
-                        if (float.TryParse(row.Cells[1].Value.ToString(), out valor))
-                        {
-                            balancoPatrimonial.AdicionarDados("Patrimonio", conta, valor);
-                        }
-                    }
-                }
-            }
-
-            if (TAtivos != 0)
-            {
-                balancoPatrimonial.AdicionarDados("Ativos", "Total Ativo", TAtivos);
-            }
-
-            if (TPassivos != 0)
-            {
-                balancoPatrimonial.AdicionarDados("Passivos", "Total Passivo", TPassivos);
-            }
-
-            balancoPatrimonial.CalcularTotais();
-
-            DataStore.AdicionarBalancoPatrimonial(balancoPatrimonial);
-        }
-
-
 
 
         private void InitializeDataSet()
@@ -149,6 +98,62 @@ namespace ConTime.Screens
             }
         }
 
+        private void SalvarDadosEmTempoReal(object sender, DataGridViewCellEventArgs e)
+        {
+            DataGridView dgv = sender as DataGridView;
+            if (dgv != null)
+            {
+                AtualizarTotalAtivos();
+                AtualizarTotalPassivos();
+                SalvarDadosNoDataStore(dgv);
+            }
+        }
+
+        private void SalvarDadosNoDataStore(DataGridView dgv)
+        {
+            DataTable dt = ColetarDadosDataGridView(dgv);
+            string tableName = dgv.Name;
+
+            if (ds.Tables.Contains(tableName))
+            {
+                ds.Tables[tableName].Clear();
+                foreach (DataRow row in dt.Rows)
+                {
+                    ds.Tables[tableName].ImportRow(row);
+                }
+            }
+            else
+            {
+                ds.Tables.Add(dt);
+            }
+
+            DataStore.BalancoPatrimonialData = ds; // Atualizar o DataStore com o DataSet atualizado
+        }
+
+        private DataTable ColetarDadosDataGridView(DataGridView dgv)
+        {
+            DataTable dt = new DataTable(dgv.Name);
+            foreach (DataGridViewColumn column in dgv.Columns)
+            {
+                dt.Columns.Add(column.Name);
+            }
+
+            foreach (DataGridViewRow row in dgv.Rows)
+            {
+                if (!row.IsNewRow)
+                {
+                    DataRow dr = dt.NewRow();
+                    foreach (DataGridViewCell cell in row.Cells)
+                    {
+                        dr[cell.ColumnIndex] = cell.Value ?? DBNull.Value;
+                    }
+                    dt.Rows.Add(dr);
+                }
+            }
+
+            return dt;
+        }
+
         private void ContentUpdate(object sender, DataGridViewCellEventArgs e)
         {
             DataGridView dgv = (DataGridView)sender;
@@ -156,8 +161,9 @@ namespace ConTime.Screens
             if (Array.IndexOf(TablesAtivos, dgv) != -1)
             {
                 int index = Array.IndexOf(TablesAtivos, dgv);
-                Ativos[index] = CalcularTotalSaldo(dgv);  
+                Ativos[index] = CalcularTotalSaldo(dgv);
                 AtualizarTotalAtivos();
+               
             }
             else if (Array.IndexOf(TablesPassivos, dgv) != -1)
             {
@@ -165,10 +171,7 @@ namespace ConTime.Screens
                 Passivos[index] = CalcularTotalSaldo(dgv);
                 AtualizarTotalPassivos();
             }
-
-            EnviarDadosParaDataStore();
         }
-
 
         private float CalcularTotalSaldo(DataGridView dgv)
         {
@@ -195,8 +198,8 @@ namespace ConTime.Screens
             TPassivos = Passivos.Sum();
             lbl_TPassivos.Text = $"{TPassivos:C}";
         }
-
-        private void btn_salvar_bpat_Click(object sender, EventArgs e)
+    
+    private void btn_salvar_bpat_Click(object sender, EventArgs e)
         {
             SalvarBalanco();
         }
@@ -212,6 +215,10 @@ namespace ConTime.Screens
                 saveFileDialog.Title = "Salvar Balanço Patrimonial";
                 saveFileDialog.DefaultExt = "csv";
 
+                if(SalvarDadosDataGridView == null)
+                {
+                    MessageBox.Show("Não há dados para salvar o Balanço Patrimonial.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     string caminhoArquivo = saveFileDialog.FileName;
@@ -242,8 +249,6 @@ namespace ConTime.Screens
             }
         }
 
-
-
         private void SalvarDadosDataGridView(StreamWriter sw, string nomeCategoria, DataGridView dgv)
         {
             sw.WriteLine(nomeCategoria);
@@ -273,6 +278,9 @@ namespace ConTime.Screens
 
             lbl_TAtivos.Text = $"{TAtivos:C}";
             lbl_TPassivos.Text = $"{TPassivos:C}";
+
+            // Atualizar DataStore para refletir as mudanças
+            DataStore.BalancoPatrimonialData = ds;
         }
 
         private void LimparTabela(string nomeTabela)
@@ -284,7 +292,7 @@ namespace ConTime.Screens
                 var dgv = TablesInterface.FirstOrDefault(d => d.DataSource == ds.Tables[nomeTabela]);
                 if (dgv != null)
                 {
-                    dgv.Refresh(); 
+                    dgv.Refresh();
                 }
             }
 
@@ -301,15 +309,16 @@ namespace ConTime.Screens
         }
 
 
+
         private void LimparPaineis()
         {
             foreach (Control painel in this.Controls)
             {
-                if (painel is Panel painelControle) 
+                if (painel is Panel painelControle)
                 {
-                    foreach (Control controle in painelControle.Controls) 
+                    foreach (Control controle in painelControle.Controls)
                     {
-                        if (controle is DataGridView dgv) 
+                        if (controle is DataGridView dgv)
                         {
                             if (dgv.IsCurrentCellInEditMode)
                             {
@@ -332,10 +341,14 @@ namespace ConTime.Screens
 
             Array.Clear(Ativos, 0, Ativos.Length);
             Array.Clear(Passivos, 0, Passivos.Length);
+
+            // Atualizar DataStore para refletir as mudanças
+            foreach (DataTable table in ds.Tables)
+            {
+                table.Rows.Clear();
+            }
+            DataStore.BalancoPatrimonialData = ds;
         }
-
-
-
 
         private void ImportarBalanco()
         {
@@ -380,31 +393,32 @@ namespace ConTime.Screens
             }
         }
 
-        public MemoryStream PdfGeral(List<Conta> ativos, List<Conta>passivos, List<Conta>patrimonio)
-        {
-            MemoryStream pdfStream = null;
 
-            Classes.BPat balanco = new Classes.BPat(ds, tb_Header.Text, TAtivos, TPassivos);
-            pdfStream = balanco.PdfCreate();
-
-            if (pdfStream != null)
-            {
-                OpenPdfForViewing(pdfStream);
-            }
-            else
-            {
-                MessageBox.Show("Erro ao gerar o PDF do Balanço Patrimonial.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            return pdfStream;
-
-            EnviarDadosParaDataStore();
-        }
         public MemoryStream PdfBalanço()
         {
             MemoryStream pdfStream = null;
+            string headerText = tb_Header.Text ?? "Cabeçalho";
 
-            Classes.BPat balanco = new Classes.BPat(ds, tb_Header.Text, TAtivos, TPassivos);
+            // Verificação se as tabelas estão vazias
+            if (ds.Tables["AtvCirculante"].Rows.Count == 0 &&
+                ds.Tables["AtvNCirculante"].Rows.Count == 0 &&
+                ds.Tables["PsvCirculante"].Rows.Count == 0 &&
+                ds.Tables["PsvNCirculante"].Rows.Count == 0 &&
+                ds.Tables["Patrimonio"].Rows.Count == 0)
+            {
+                MessageBox.Show("Não há dados para gerar o PDF do Balanço Patrimonial.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null; // Interrompe a execução caso não haja dados
+            }
+
+            // Passando cinco DataTable como argumentos para o construtor de BPat
+            Classes.BPat balanco = new Classes.BPat(
+                ds.Tables["AtvCirculante"],
+                ds.Tables["AtvNCirculante"],
+                ds.Tables["PsvCirculante"],
+                ds.Tables["PsvNCirculante"],
+                ds.Tables["Patrimonio"]
+            );
+
             pdfStream = balanco.PdfCreate();
 
             if (pdfStream != null)
@@ -417,9 +431,8 @@ namespace ConTime.Screens
             }
 
             return pdfStream;
-
-            EnviarDadosParaDataStore();
         }
+
 
         private void OpenPdfForViewing(MemoryStream pdfStream)
         {
@@ -511,6 +524,11 @@ namespace ConTime.Screens
         private void button3_Click(object sender, EventArgs e)
         {
             LimparTabelas();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+           
         }
     }
 }

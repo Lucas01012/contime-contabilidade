@@ -23,25 +23,33 @@ namespace ConTime.Screens
 {
     public partial class Exer : UserControl
     {
+        private float[] resul = new float[8];
+        private DataSet DS = new DataSet();
         private DataTable dados;
 
         public Exer()
         {
             InitializeComponent();
-            this.Size = new Size(300, 200);
+            this.Size = new Size(359, 200);
         }
 
         public void SalvarTudo()
         {
+            string balanceteFilePath = null;
+            string livroDiarioFilePath = null;
+            string dreFilePath = null;
+            string razoneteFilePath = null;
+            string balancoFilePath = null;
+
             try
             {
-                string balanceteFilePath = GerarArquivoBalancete();
-
-                string livroDiarioFilePath = GerarArquivoLDia();
+                balanceteFilePath = GerarArquivoBalancete();
+                livroDiarioFilePath = GerarArquivoLDia();
+                dreFilePath = GerarArquivoDre();
+                balancoFilePath = GerarArquivoBalancoPatrimonial();
 
                 var razonete = new Razonete();
-
-              string razoneteFilePath =  razonete.GerarArquivoRazonete();  // Agora não esperamos o retorno do caminho
+                razoneteFilePath = razonete.GerarArquivoRazonete();
 
                 using (SaveFileDialog saveFileDialog = new SaveFileDialog())
                 {
@@ -56,9 +64,12 @@ namespace ConTime.Screens
                         using (var zipFileStream = new FileStream(zipFilePath, FileMode.Create))
                         using (var zipArchive = new ZipArchive(zipFileStream, ZipArchiveMode.Create))
                         {
-                            AddFileToZip(zipArchive, "Balancete.csv", balanceteFilePath);
-                            AddFileToZip(zipArchive, "LivroDiario.csv", livroDiarioFilePath);
-                            AddFileToZip(zipArchive, "Razonetes.csv", razoneteFilePath);
+                            // Adicionar arquivos ao ZIP
+                            zipArchive.CreateEntryFromFile(balanceteFilePath, "Balancete.csv");
+                            zipArchive.CreateEntryFromFile(livroDiarioFilePath, "LivroDiario.csv");
+                            zipArchive.CreateEntryFromFile(razoneteFilePath, "Razonetes.csv");
+                            zipArchive.CreateEntryFromFile(dreFilePath, "Dre.csv");
+                            zipArchive.CreateEntryFromFile(balancoFilePath, "BalancoPatrimonial.csv");
 
                             MessageBox.Show("Arquivos salvos e compactados com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
@@ -69,8 +80,26 @@ namespace ConTime.Screens
             {
                 MessageBox.Show($"Erro ao salvar os módulos: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            finally
+            {
+                if (balanceteFilePath != null && File.Exists(balanceteFilePath))
+                {
+                    File.Delete(balanceteFilePath);
+                }
+                if (livroDiarioFilePath != null && File.Exists(livroDiarioFilePath))
+                {
+                    File.Delete(livroDiarioFilePath);
+                }
+                if (dreFilePath != null && File.Exists(dreFilePath))
+                {
+                    File.Delete(dreFilePath);
+                }
+                if (razoneteFilePath != null && File.Exists(razoneteFilePath))
+                {
+                    File.Delete(razoneteFilePath);
+                }
+            }
         }
-
 
         private string GerarArquivoBalancete()
         {
@@ -89,8 +118,71 @@ namespace ConTime.Screens
                     writer.WriteLine($"{codigo},{conta},{credor},{devedor},{saldo}");
                 }
             }
-            return filePath; 
+            return filePath;
         }
+        private string GerarArquivoDre()
+        {
+            string filePath = Path.Combine(Path.GetTempPath(), "Dre.csv");
+            using (StreamWriter writer = new StreamWriter(filePath))
+            {
+                string[] tables = { "RBruta", "Imposto", "Custos", "Despesas", "OutrasR", "Resultados Calculados" };
+
+                foreach (string tableName in tables)
+                {
+                    if (DataStore.DreData.Tables.Contains(tableName))
+                    {
+                        writer.WriteLine($"Tabela: {tableName}");
+                        writer.WriteLine("Receita,Valor");
+
+                        foreach (DataRow row in DataStore.DreData.Tables[tableName].Rows)
+                        {
+                            string receita = row["Receita"]?.ToString() ?? "";
+                            string valor = row["Valor"]?.ToString() ?? "";
+                            writer.WriteLine($"{receita},{valor}");
+                        }
+
+                        writer.WriteLine();
+                    }
+                }
+            }
+            return filePath;
+        }
+        private string GerarArquivoBalancoPatrimonial()
+        {
+            string filePath = Path.Combine(Path.GetTempPath(), "BalancoPatrimonial.csv");
+            using (StreamWriter writer = new StreamWriter(filePath))
+            {
+                string[] tables = { "AtvCirculante", "AtvNCirculante", "PsvCirculante", "PsvNCirculante", "Patrimonio" };
+
+                foreach (string tableName in tables)
+                {
+                    if (DataStore.BalancoPatrimonialData.Tables.Contains(tableName))
+                    {
+                        DataTable table = DataStore.BalancoPatrimonialData.Tables[tableName];
+                        if (table.Rows.Count > 0)
+                        {
+                            writer.WriteLine($"Tabela: {tableName}");
+                            writer.WriteLine("Nome,Valor");
+
+                            foreach (DataRow row in table.Rows)
+                            {
+                                string nome = row[0]?.ToString() ?? "";
+                                string valor = row[1]?.ToString() ?? "";
+
+                                if (!string.IsNullOrWhiteSpace(nome) || !string.IsNullOrWhiteSpace(valor))
+                                {
+                                    writer.WriteLine($"{nome},{valor}");
+                                }
+                            }
+
+                            writer.WriteLine();
+                        }
+                    }
+                }
+            }
+            return filePath;
+        }
+
 
         private string GerarArquivoLDia()
         {
@@ -170,42 +262,174 @@ namespace ConTime.Screens
         }
         private MemoryStream DRE()
         {
-            var dre = new Dre();
+            DataSet dreData = DataStore.DreData;
 
-            foreach (var painel in DataStore.DrePanéisData)
+            if (dreData == null || dreData.Tables.Count == 0)
             {
-                DataTable painelData = painel.Value;
+                throw new InvalidOperationException("Não há dados para gerar o PDF da DRE.");
+            }
 
-                if (painelData != null && painelData.Rows.Count > 0)
+            string[] requiredTables = { "RBruta", "Imposto", "Custos", "Despesas", "ROutras" };
+
+            foreach (string tableName in requiredTables)
+            {
+                if (!dreData.Tables.Contains(tableName) || dreData.Tables[tableName].Rows.Count == 0)
                 {
-                    foreach (DataRow row in painelData.Rows)
-                    {
-                        string conta = row["Conta"].ToString();
-                        string valor = row["Valor"].ToString();
-
-                    }
+                    throw new InvalidOperationException($"A tabela {tableName} está faltando ou não possui dados.");
                 }
             }
 
-            return dre.GerarPdf();
+            // Cálculos das métricas financeiras
+            float receitaLiquida = CalcularReceitaLiquida(dreData.Tables["RBruta"], dreData.Tables["Imposto"]);
+            float lucroBruto = CalcularLucroBruto(receitaLiquida, dreData.Tables["Custos"]);
+            float lucroLiquido = CalcularLucroLiquido(lucroBruto, dreData.Tables["Despesas"], dreData.Tables["ROutras"]);
+
+            var dre = new Classes.Dre(
+                dreData.Tables["RBruta"],
+                dreData.Tables["Imposto"],
+                dreData.Tables["Custos"],
+                dreData.Tables["Despesas"],
+                dreData.Tables["ROutras"],
+                receitaLiquida, lucroBruto, lucroLiquido
+            );
+
+            // Preencher o DataStore
+            dre.PreencherDataStore();
+
+            try
+            {
+                using (var pdfStream = dre.PdfCreate())
+                {
+                    MemoryStream pdfMemoryStream = new MemoryStream();
+                    pdfStream.CopyTo(pdfMemoryStream);
+                    OpenPdfForViewing(pdfMemoryStream);
+                    return pdfMemoryStream;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao gerar o PDF: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
+            }
         }
 
-
-
-        private MemoryStream BPat()
+        private float CalcularReceitaLiquida(DataTable rBruta, DataTable impostos)
         {
-            var balancoPatrimonial = DataStore.BalancoPatrimoniais.FirstOrDefault();
+            float receitaBruta = 0;
+            float totalImpostos = 0;
 
-            if (balancoPatrimonial == null ||
-                (balancoPatrimonial.Ativos.Count == 0 && balancoPatrimonial.Passivos.Count == 0 && balancoPatrimonial.Patrimonio.Count == 0))
+            foreach (DataRow row in rBruta.Rows)
             {
-                throw new InvalidOperationException("Não há dados suficientes para gerar o PDF do Balanço Patrimonial.");
+                if (float.TryParse(row["Valor"].ToString(), out float valor))
+                {
+                    receitaBruta += valor;
+                }
+                else
+                {
+                    MessageBox.Show($"Formato inválido na tabela RBruta: {row["Valor"]}");
+                }
             }
 
-            var Bpat = new BPat();
+            foreach (DataRow row in impostos.Rows)
+            {
+                if (float.TryParse(row["Valor"].ToString(), out float valor))
+                {
+                    totalImpostos += valor;
+                }
+                else
+                {
+                    MessageBox.Show($"Formato inválido na tabela Imposto: {row["Valor"]}");
+                }
+            }
 
-            return Bpat.PdfGeral(balancoPatrimonial.Ativos, balancoPatrimonial.Passivos, balancoPatrimonial.Patrimonio);
+            return receitaBruta - totalImpostos;
         }
+
+        private float CalcularLucroBruto(float receitaLiquida, DataTable custos)
+        {
+            float totalCustos = 0;
+
+            foreach (DataRow row in custos.Rows)
+            {
+                if (float.TryParse(row["Valor"].ToString(), out float valor))
+                {
+                    totalCustos += valor;
+                }
+
+            }
+
+            return receitaLiquida - totalCustos;
+        }
+
+        private float CalcularLucroLiquido(float lucroBruto, DataTable despesas, DataTable outrasReceitasDespesas)
+        {
+            float totalDespesas = 0;
+            float totalOutras = 0;
+
+            foreach (DataRow row in despesas.Rows)
+            {
+                if (float.TryParse(row["Valor"].ToString(), out float valor))
+                {
+                    totalDespesas += valor;
+                }
+                else
+                {
+                    MessageBox.Show($"Formato inválido na tabela Despesas: {row["Valor"]}");
+                }
+            }
+
+            foreach (DataRow row in outrasReceitasDespesas.Rows)
+            {
+                if (float.TryParse(row["Valor"].ToString(), out float valor))
+                {
+                    totalOutras += valor;
+                }
+
+            }
+
+            return lucroBruto - totalDespesas + totalOutras;
+        }
+
+
+
+        private MemoryStream PdfBPat()
+        {
+            DataSet bPat = DataStore.BalancoPatrimonialData;
+
+            if (bPat == null || bPat.Tables.Count == 0)
+            {
+                throw new InvalidOperationException("Não há dados para gerar o PDF do balanço patrimonial.");
+            }
+
+            string[] requiredTables = { "AtvCirculante", "AtvNCirculante", "PsvCirculante", "PsvNCirculante", "Patrimonio"};
+
+            foreach (string tableName in requiredTables)
+            {
+                if (!bPat.Tables.Contains(tableName))
+                {
+                    bPat.Tables.Add(new DataTable(tableName));
+                }
+            }
+
+            var Balanco = new Classes.BPat(
+                bPat.Tables["AtvCirculante"],
+                bPat.Tables["AtvNCirculante"],
+                bPat.Tables["PsvCirculante"],
+                bPat.Tables["PsvNCirculante"],
+                bPat.Tables["Patrimonio"]
+            );
+
+            try
+            {
+                return Balanco.PdfCreate();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao gerar o PDF: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
+            }
+        }
+
 
 
         private MemoryStream PdfLdia()
@@ -230,7 +454,7 @@ namespace ConTime.Screens
                 MemoryStream RazoneteStream = PdfRazonete();
                 MemoryStream balanceteStream = PdfBalancete();
                 MemoryStream DreStream = DRE();
-                MemoryStream BpatStream = BPat();
+                MemoryStream BpatStream = PdfBPat();
 
                 MemoryStream combinedPdfStream = CombinePDFs(ldiaStream, RazoneteStream, balanceteStream, DreStream, BpatStream);
 
@@ -296,11 +520,21 @@ namespace ConTime.Screens
 
             try
             {
+                // Verifica se o arquivo já está aberto antes de criar um novo
+                if (IsFileOpen(tempFilePath))
+                {
+                    MessageBox.Show("O arquivo PDF já está aberto. Feche o arquivo antes de tentar abri-lo novamente.",
+                                    "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Salva o PDF no caminho temporário
                 using (FileStream fileStream = new FileStream(tempFilePath, FileMode.Create, FileAccess.Write))
                 {
                     pdfStream.WriteTo(fileStream);
                 }
 
+                // Abre o PDF no visualizador padrão
                 var processInfo = new ProcessStartInfo(tempFilePath)
                 {
                     UseShellExecute = true
@@ -313,9 +547,35 @@ namespace ConTime.Screens
             }
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="filePath">O caminho do arquivo a verificar.</param>
+        /// <returns>Retorna true se o arquivo está aberto; caso contrário, false.</returns>
+        private bool IsFileOpen(string filePath)
+        {
+            if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
+                return false;
+
+            try
+            {
+                using (FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+                {
+                    stream.Close();
+                }
+            }
+            catch (IOException)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+
         private void btn_Salvar_Click(object sender, EventArgs e)
         {
             SalvarTudo();
         }
+
     }
 }

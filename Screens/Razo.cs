@@ -19,9 +19,9 @@ namespace ConTime.Screens
         private Razonete _parentRazonete;
         public static string tablename = "Razo";
         public static string linhasname = "Razo_Linhas";
-        public DataGridView dgv1; // Adicionando o primeiro DataGridView
-        public DataGridView dgv2; // Adicionando o segundo DataGridView
-        public Label header; // Adicionando o cabeçalho
+        public DataGridView dgv1;
+        public DataGridView dgv2;
+        public Label header;
         public String RazoneteHeader { get; set; }
 
         public TextBox txtHeader { get; set; }
@@ -40,21 +40,19 @@ namespace ConTime.Screens
             InitializeHeader(cabecalho);
             InicializaRegistros();
             InitializePanel();
-            InitializeCustomComponents(); // Inicializa os componentes personalizados
+            InitializeCustomComponents();
+
+            txtHeader.Text = cabecalho;
         }
         public object ObterDadosParaEnvio()
         {
-            // Cria uma lista para armazenar os dados dos registros
             var registros = new List<object>();
 
-            // Itera sobre todas as linhas da tabela de "Razo_Linhas"
             foreach (DataRow row in ds.Tables[linhasname].Rows)
             {
-                // Extrai os valores de débito e crédito
                 decimal debito = row.Field<decimal>("Debito");
                 decimal credito = row.Field<decimal>("Credito");
 
-                // Adiciona os dados de cada linha à lista de registros
                 registros.Add(new
                 {
                     Debito = debito,
@@ -62,35 +60,31 @@ namespace ConTime.Screens
                 });
             }
 
-            // Retorna os dados como um objeto anônimo com o cabeçalho e os registros
             return new
             {
-                Cabecalho = this.RazoneteHeader,  // Cabeçalho do razonete
-                Registros = registros            // Lista de registros (débito e crédito)
+                Cabecalho = this.RazoneteHeader, 
+                Registros = registros 
             };
         }
 
 
         private void InitializeHeader(string cabecalho)
         {
-            // Verifica se o txtHeader ainda não foi inicializado
             if (txtHeader == null)
             {
                 txtHeader = new TextBox
                 {
                     Name = "txtHeader",
-                    Location = new System.Drawing.Point(10, 10),  // Posição no painel
-                    Size = new System.Drawing.Size(200, 20),      // Tamanho do TextBox
-                    Text = cabecalho  // Passa o cabeçalho inicial
+                    Location = new System.Drawing.Point(10, 10),  
+                    Size = new System.Drawing.Size(200, 20),     
+                    Text = cabecalho 
                 };
 
-                // Adiciona o TextBox ao controle (supondo que você tenha um painel ou algo onde adicionar)
                 this.Controls.Add(txtHeader);
 
-                // Registra o evento de alteração do texto para atualizar a propriedade RazoneteHeader
                 txtHeader.TextChanged += (sender, e) =>
                 {
-                    RazoneteHeader = txtHeader.Text;  // Atualiza a propriedade com o valor do texto
+                    RazoneteHeader = txtHeader.Text; 
                 };
             }
         }
@@ -107,6 +101,7 @@ namespace ConTime.Screens
         {
             return Header.Text;
         }
+
         private void TxtHeader_TextChanged(object sender, EventArgs e)
         {
             string cabecalho = txtHeader.Text;
@@ -115,9 +110,9 @@ namespace ConTime.Screens
 
         }
 
+
         private void InitializeCustomComponents()
         {
-            // Inicialização do DataGridView1
             dgv1 = new DataGridView
             {
                 Anchor = (AnchorStyles.Top | AnchorStyles.Left),
@@ -132,7 +127,6 @@ namespace ConTime.Screens
                 ScrollBars = ScrollBars.Vertical
             };
 
-            // Inicialização do DataGridView2 (o dgv_result)
             dgv2 = new DataGridView
             {
                 Anchor = (AnchorStyles.Top | AnchorStyles.Left),
@@ -149,7 +143,6 @@ namespace ConTime.Screens
 
             dataGridView1.KeyPress += DataGridView1_KeyPress;
             dataGridView1.DataError += DataGridView1_DataError;
-            // Inicialização do cabeçalho
             header = new Label
             {
                 Text = "Cabeçalho Ajustado",
@@ -159,7 +152,6 @@ namespace ConTime.Screens
                 Size = new Size(200, 30)
             };
 
-            // Adicionando os componentes ao controle
             this.Controls.Add(dgv1);
             this.Controls.Add(dgv2);
             this.Controls.Add(header);
@@ -167,29 +159,22 @@ namespace ConTime.Screens
 
         private void DataGridView1_KeyPress(object sender, KeyPressEventArgs e)
         {
-            // Verifica se a célula editada é a coluna "Débito" ou "Crédito"
             if (dataGridView1.CurrentCell.OwningColumn.Name == "Débito" || dataGridView1.CurrentCell.OwningColumn.Name == "Crédito")
             {
-                // Se a tecla pressionada não for um número, backspace ou ponto
                 if (!char.IsDigit(e.KeyChar) && e.KeyChar != (char)8 && e.KeyChar != '.')
                 {
-                    // Cancela a ação de inserção
                     e.Handled = true;
 
-                    // Exibe uma mensagem de erro
                     MessageBox.Show("Por favor, insira apenas números ou um ponto (.) para valores decimais.", "Erro de entrada", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
         private void DataGridView1_DataError(object sender, DataGridViewDataErrorEventArgs e)
         {
-            // Verifica se o erro está relacionado ao valor digitado
             if (e.Exception is FormatException)
             {
-                // Impede a exibição da caixa de diálogo padrão
                 e.Cancel = true;
 
-                // Exibe uma mensagem de erro personalizada
                 MessageBox.Show("Por favor, insira apenas números válidos.", "Erro de entrada", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -362,7 +347,6 @@ namespace ConTime.Screens
         {
             float totalDebito = 0, totalCredito = 0;
 
-            // Soma os totais de débito e crédito
             foreach (DataGridViewRow row in dataGridView1.Rows)
             {
                 if (row.Cells["Debito"].Value != null && float.TryParse(row.Cells["Debito"].Value.ToString(), out float debito))
@@ -376,11 +360,9 @@ namespace ConTime.Screens
                 }
             }
 
-            // Atualiza as células de totais
             dgv_result[0, 0].Value = totalDebito;
             dgv_result[1, 0].Value = totalCredito;
 
-            // Força a atualização do DataGridView de resultados
             dgv_result.Refresh();
         }
 
@@ -391,7 +373,7 @@ namespace ConTime.Screens
             dgv.ClearSelection();
         }
 
-        public Classes.Razo TabelaRazonete()
+        public ConTime.Classes.Razo TabelaRazonete()
         {
             return new Classes.Razo(ds, txtHeader.Text);
         }
@@ -404,10 +386,9 @@ namespace ConTime.Screens
 
             ds.Tables[linhasname].Rows.Add(newRow);
 
-            // Forçar o DataGridView a se atualizar
-            dataGridView1.Refresh();  // Atualiza o DataGridView imediatamente
-            dataGridView1.Invalidate(); // Redesenha o DataGridView, se necessário
-            CalcularTotais();  // Pode ser interessante recalcular os totais após adicionar um registro
+            dataGridView1.Refresh();
+            dataGridView1.Invalidate(); 
+            CalcularTotais();
         }
 
 
@@ -422,16 +403,12 @@ namespace ConTime.Screens
         }
         public void ConfigurarCoresDataGridView()
         {
-            // Cor de fundo da grade
             dataGridView1.BackgroundColor = Color.FromArgb(185, 220, 200);
 
-            // Cor de fundo das células
             dataGridView1.DefaultCellStyle.BackColor = Color.FromArgb(185, 220, 200);
 
-            // Cor de seleção das células
             dataGridView1.DefaultCellStyle.SelectionBackColor = Color.FromArgb(185, 220, 200);
 
-            // Cor de fundo do cabeçalho
             dataGridView1.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(185, 220, 200);
             dataGridView1.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
             dataGridView1.ColumnHeadersDefaultCellStyle.Font = new Font("Yu Gothic UI", 12, FontStyle.Bold);
@@ -440,7 +417,6 @@ namespace ConTime.Screens
             dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dataGridView1.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
 
-            // Cor de fundo das linhas alternadas
             dataGridView1.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(185, 220, 200);
 
             dgv_result.BackgroundColor = Color.FromArgb(185, 220, 200);

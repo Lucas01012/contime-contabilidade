@@ -3,25 +3,39 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Security.Cryptography.Pkcs;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ConTime.Classes
 {
-    public class DataStore
+    public static class DataStore
     {
         public static DataTable BalanceteData { get; set; }
         public static DataTable LdiaData { get; set; }
-        public static Dictionary<string, DataTable> DrePanéisData { get; set; }
-        public static List<BalancoPatrimonialData> BalancoPatrimoniais { get; set; }
+        public static Dictionary<string, DataTable> DrePanéisData { get; set; } = new Dictionary<string, DataTable>();
         public static List<Razonete> RazonetesData { get; set; }
+        public static DataSet BalancoPatrimonialData { get; set; } = new DataSet("BalancoPatrimonial");
+        public static DataSet DreData { get; set; } = new DataSet("DreData");
+        public static DataTable AtvCirculanteData { get; set; }
+        public static DataTable AtvNCirculanteData { get; set; }
+        public static DataTable PsvCirculanteData { get; set; }
+        public static DataTable PsvNCirculanteData { get; set; }
+        public static DataTable PatrimonioData { get; set; }
 
         public static void LimparDados()
         {
             BalanceteData = null;
             LdiaData = null;
-            RazonetesData = new List<Razonete>();
+            RazonetesData.Clear();
             DrePanéisData.Clear();
+            BalancoPatrimonialData = new DataSet("BalancoPatrimonial");
+            DreData = new DataSet("DreData");
+            AtvCirculanteData = null;
+            AtvNCirculanteData = null;
+            PsvCirculanteData = null;
+            PsvNCirculanteData = null;
+            PatrimonioData = null;
         }
 
         static DataStore()
@@ -42,34 +56,16 @@ namespace ConTime.Classes
             BalanceteData.Columns.Add("Credor");
             BalanceteData.Columns.Add("Saldo");
 
-            DrePanéisData = new Dictionary<string, DataTable>
-        {
-            { "Receita Bruta", new DataTable() },
-            { "Impostos", new DataTable() },
-            { "Receita Líquida", new DataTable() },
-            { "Lucro Operacional Bruto", new DataTable() },
-            { "Despesas", new DataTable() },
-            { "Outras Receitas", new DataTable() },
-            { "Resultado de Lucro do Exercício", new DataTable() }
-        };
-
-            foreach (var painel in DrePanéisData.Values)
-            {
-                painel.Columns.Add("Conta");
-                painel.Columns.Add("Valor");
-            }
-
-            BalancoPatrimoniais = new List<BalancoPatrimonialData>();
+            BalancoPatrimonialData = new DataSet("BalancoPatrimonial");
+            AtvCirculanteData = new DataTable();
+            AtvNCirculanteData = new DataTable();
+            PsvNCirculanteData = new DataTable();
+            PsvCirculanteData = new DataTable();
+            PatrimonioData = new DataTable();
 
             RazonetesData = new List<Razonete>();
         }
-        public static void AdicionarBalancoPatrimonial(BalancoPatrimonialData balanco)
-        {
-            if (balanco == null)
-            {
-                BalancoPatrimoniais.Add(balanco);
-            }
-        }
+
         public static void SalvarRazonete(Razonete razonete)
         {
             if (razonete != null)
@@ -82,6 +78,29 @@ namespace ConTime.Classes
             }
         }
 
+        public static void AdicionarDreData(string tabela, string receita, string valor)
+        {
+            if (!DreData.Tables.Contains(tabela))
+            {
+                DataTable dt = DreData.Tables.Add(tabela);
+                dt.Columns.Add("Receita");
+                dt.Columns.Add("Valor");
+            }
+            DataTable table = DreData.Tables[tabela];
+            DataRow row = table.NewRow();
+            row["Receita"] = receita;
+            row["Valor"] = valor;
+            table.Rows.Add(row);
+        }
+
+        public static void LimparDreData()
+        {
+            foreach (DataTable table in DreData.Tables)
+            {
+                table.Rows.Clear();
+            }
+        }
+
         public static List<Razonete> ObterRazonetes()
         {
             return RazonetesData;
@@ -91,52 +110,7 @@ namespace ConTime.Classes
         {
             RazonetesData.Clear();
         }
+    }
 
-        public static void AdicionarDreData(string painel, string conta, string valor)
-        {
-            if (DrePanéisData.ContainsKey(painel) && !string.IsNullOrEmpty(conta) && !string.IsNullOrEmpty(valor))
-            {
-                DataTable painelData = DrePanéisData[painel];
-                DataRow newRow = painelData.NewRow();
-                newRow["Conta"] = conta;
-                newRow["Valor"] = valor;
-                painelData.Rows.Add(newRow);
-            }
-        }
-
-        public static void AtualizarValorDre(string painel, string conta, string novoValor)
-        {
-            if (DrePanéisData.ContainsKey(painel))
-            {
-                DataTable painelData = DrePanéisData[painel];
-                foreach (DataRow row in painelData.Rows)
-                {
-                    if (row["Conta"].ToString() == conta)
-                    {
-                        row["Valor"] = novoValor;
-                        break;
-                    }
-                }
-            }
-        }
-
-        public static DataTable ObterDreDataPorPainel(string painel)
-        {
-            if (DrePanéisData.ContainsKey(painel))
-            {
-                return DrePanéisData[painel];
-            }
-            return null;
-        }
-
-        public static void LimparDreDataPorPainel(string painel)
-        {
-            if (DrePanéisData.ContainsKey(painel))
-            {
-                DrePanéisData[painel].Clear();
-            }
-        }
-
-    } 
 
 }

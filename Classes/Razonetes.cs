@@ -5,19 +5,28 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
-
+using System.Security.Cryptography.X509Certificates;
+using ConTime.Classes;
 namespace ConTime.Classes
 {
     public class Razonetes
     {
         public string id;
-        string cabecario = "Lorem Ipsu";
-        public  List<Razo> razonetes = new();
-        private List<Razo> _razos;
+        string cabecario = "L";
+        public List<Razo> razonetes = new();
+        public List<Razonete> RazonetesList { get; set; } = new List<Razonete>();
 
         public void AddRazonete(Razo razonete)
         {
             razonetes.Add(razonete);
+        }
+
+        public void UpdateAllHeaders(string newHeader)
+        {
+            foreach (var razo in razonetes)
+            {
+                razo.UpdateHeader(newHeader); // Atualiza o cabeçalho para cada Razo
+            }
         }
 
         #region PDF
@@ -38,11 +47,15 @@ namespace ConTime.Classes
             int maxRazoneteHeight = 0;
             int count = 0;
 
-
-
-            foreach (var razonete in razonetes)
+            // Obtém o cabeçalho atualizado de cada 'Razo' na lista 'razonetes'
+            foreach (var currentRazo in razonetes)
             {
-                int razoneteHeight = razonete.GetHeight(gfx, razoneteWidth);
+                string cabecalhoAtual = currentRazo.SalvarHeader(); // Obtém o cabeçalho de cada instância de Razo
+
+                // Atualiza o cabeçalho de cada Razo com o cabeçalho obtido
+                currentRazo.UpdateHeader(cabecalhoAtual); // Atualiza o cabeçalho de cada Razo
+
+                int razoneteHeight = currentRazo.GetHeight(gfx, razoneteWidth);
                 maxRazoneteHeight = Math.Max(maxRazoneteHeight, razoneteHeight);
 
                 if (count > 0 && count % 4 == 0)
@@ -59,9 +72,7 @@ namespace ConTime.Classes
                     }
                 }
 
-                gfx.DrawRectangle(XPens.Black, xPos, yPos, razoneteWidth, razoneteHeight);
-                gfx.DrawString(razonete.Header, new XFont("Helvetica", 12, XFontStyle.Bold), XBrushes.Black, new XRect(xPos + 5, yPos + 5, razoneteWidth, 20), XStringFormats.TopLeft);
-                razonete.CreateTable(gfx, xPos + 5, yPos + 30, razoneteWidth - 10);
+                currentRazo.CreatePanel(gfx, xPos, yPos, razoneteWidth);
 
                 xPos += razoneteWidth + margin;
                 count++;
@@ -69,46 +80,15 @@ namespace ConTime.Classes
 
             pdfDoc.Save(pdfStream, false);
             pdfStream.Position = 0;
-            
 
             return pdfStream;
         }
 
-        public MemoryStream PdfCreate()
-        {
-            // Gera o PDF e obtém o MemoryStream
-            var pdfStream = CreatePDF();
-
-            // Retorna o MemoryStream gerado
-            return pdfStream;
-        }
-
-
-        public void VisualizarPDF(MemoryStream pdfStream)
-        {
-            if (pdfStream == null || pdfStream.Length == 0)
-            {
-                MessageBox.Show("Erro ao gerar o PDF. O stream está vazio.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            string tempFilePath = Path.Combine(Path.GetTempPath(), "tempRazonetes.pdf");
-            File.WriteAllBytes(tempFilePath, pdfStream.ToArray());
-
-            var startInfo = new System.Diagnostics.ProcessStartInfo(tempFilePath)
-            {
-                UseShellExecute = true
-            };
-            System.Diagnostics.Process.Start(startInfo);
-            #endregion
-        }
-        public void CarregarDados(List<Razo> razos)
-        {
-            _razos = razos;  // Armazena a lista de razonetes
-        }
-
-
+        #endregion
     }
+
+
+
 
     public class Razo
     {
@@ -139,6 +119,17 @@ namespace ConTime.Classes
                 float.TryParse(Convert.ToString(totais["Total_Credito"]), out totalC);
             }
         }
+
+
+        public void UpdateHeader(string newHeader)
+        {
+            Header = newHeader;
+        }
+        public string SalvarHeader()
+        {
+            return Header;
+        }
+
         public void CreateTableTotals(XGraphics gfx, int xPos, int yPos, int width)
         {
             int rowHeight = 20;
@@ -218,15 +209,9 @@ namespace ConTime.Classes
 
         public void CreatePanel(XGraphics gfx, int xPos, int yPos, int width)
         {
-            int rowHeight = 20;
-
-            // Desenha o restante do conteúdo dentro do painel
-            CreateTable(gfx, xPos + 5, yPos + 30, width - 10);
-
-            // Ajuste a altura do painel para incluir os totais e o cabeçalho
             int razoneteHeight = GetHeight(gfx, width);
 
-            // Desenhar o painel completo com a altura correta por último
+            // Desenhar o painel completo com a altura correta
             gfx.DrawRectangle(XPens.Black, xPos, yPos, width, razoneteHeight);
 
             // Adicionar o cabeçalho
@@ -235,6 +220,9 @@ namespace ConTime.Classes
                 XBrushes.Black,
                 new XRect(xPos + 5, yPos + 5, width - 10, 20),
                 XStringFormats.TopLeft);
+
+            // Desenha o restante do conteúdo dentro do painel
+            CreateTable(gfx, xPos + 5, yPos + 30, width - 10);
         }
 
         public int GetHeight(XGraphics gfx, int width)
@@ -248,9 +236,6 @@ namespace ConTime.Classes
 
             return height;
         }
-
-
-
 
         public class RazoRegistro
         {

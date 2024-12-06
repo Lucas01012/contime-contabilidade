@@ -44,8 +44,8 @@
             button7 = new Button();
             btn_salvar_bal = new Button();
             panel2 = new Panel();
-            panel3 = new Panel();
             button1 = new Button();
+            panel3 = new Panel();
             ((System.ComponentModel.ISupportInitialize)dgv_bal).BeginInit();
             panel1.SuspendLayout();
             panel2.SuspendLayout();
@@ -104,10 +104,10 @@
             btn_insert.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btn_insert.BackColor = Color.FromArgb(185, 220, 201);
             btn_insert.Font = new Font("Yu Gothic UI", 9.75F, FontStyle.Bold);
-            btn_insert.Location = new Point(143, 70);
+            btn_insert.Location = new Point(131, 70);
             btn_insert.Margin = new Padding(3, 2, 3, 2);
             btn_insert.Name = "btn_insert";
-            btn_insert.Size = new Size(66, 33);
+            btn_insert.Size = new Size(75, 33);
             btn_insert.TabIndex = 22;
             btn_insert.Text = "Inserir";
             btn_insert.UseVisualStyleBackColor = false;
@@ -133,10 +133,10 @@
             btn_delete.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btn_delete.BackColor = Color.FromArgb(185, 220, 201);
             btn_delete.Font = new Font("Yu Gothic UI", 9.75F, FontStyle.Bold);
-            btn_delete.Location = new Point(143, 117);
+            btn_delete.Location = new Point(131, 118);
             btn_delete.Margin = new Padding(3, 2, 3, 2);
             btn_delete.Name = "btn_delete";
-            btn_delete.Size = new Size(66, 33);
+            btn_delete.Size = new Size(75, 33);
             btn_delete.TabIndex = 23;
             btn_delete.Text = "Apagar";
             btn_delete.UseVisualStyleBackColor = false;
@@ -223,9 +223,9 @@
             // 
             button7.BackColor = Color.FromArgb(185, 220, 201);
             button7.Font = new Font("Yu Gothic UI", 9.75F, FontStyle.Bold);
-            button7.Location = new Point(6, 268);
+            button7.Location = new Point(69, 300);
             button7.Name = "button7";
-            button7.Size = new Size(66, 33);
+            button7.Size = new Size(81, 33);
             button7.TabIndex = 34;
             button7.Text = "PDF";
             button7.UseVisualStyleBackColor = false;
@@ -235,9 +235,9 @@
             // 
             btn_salvar_bal.BackColor = Color.FromArgb(185, 220, 201);
             btn_salvar_bal.Font = new Font("Yu Gothic UI", 9.75F, FontStyle.Bold);
-            btn_salvar_bal.Location = new Point(78, 268);
+            btn_salvar_bal.Location = new Point(6, 250);
             btn_salvar_bal.Name = "btn_salvar_bal";
-            btn_salvar_bal.Size = new Size(66, 33);
+            btn_salvar_bal.Size = new Size(76, 33);
             btn_salvar_bal.TabIndex = 35;
             btn_salvar_bal.Text = "Salvar";
             btn_salvar_bal.UseVisualStyleBackColor = false;
@@ -257,6 +257,18 @@
             panel2.Size = new Size(219, 472);
             panel2.TabIndex = 36;
             // 
+            // button1
+            // 
+            button1.BackColor = Color.FromArgb(185, 220, 201);
+            button1.Font = new Font("Yu Gothic UI", 9.75F, FontStyle.Bold);
+            button1.Location = new Point(132, 250);
+            button1.Name = "button1";
+            button1.Size = new Size(76, 33);
+            button1.TabIndex = 36;
+            button1.Text = "Importar";
+            button1.UseVisualStyleBackColor = false;
+            button1.Click += button1_Click;
+            // 
             // panel3
             // 
             panel3.Controls.Add(dgv_bal);
@@ -266,18 +278,6 @@
             panel3.Name = "panel3";
             panel3.Size = new Size(446, 472);
             panel3.TabIndex = 37;
-            // 
-            // button1
-            // 
-            button1.BackColor = Color.FromArgb(185, 220, 201);
-            button1.Font = new Font("Yu Gothic UI", 9.75F, FontStyle.Bold);
-            button1.Location = new Point(150, 268);
-            button1.Name = "button1";
-            button1.Size = new Size(69, 33);
-            button1.TabIndex = 36;
-            button1.Text = "Importar";
-            button1.UseVisualStyleBackColor = false;
-            button1.Click += button1_Click;
             // 
             // Bal
             // 

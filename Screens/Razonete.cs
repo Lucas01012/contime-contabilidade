@@ -194,40 +194,65 @@ namespace ConTime.Screens
             foreach (Razo razo in razos)
             {
                 razonete.AddRazonete(razo.TabelaRazonete());
-                pdfStream = razonete.PdfCreate();
+                pdfStream = razonete.CreatePDF();
             }
             return pdfStream;
         }
         public MemoryStream GerarPdf()
         {
             Classes.Razonetes razonete = new Classes.Razonetes();
-            
             MemoryStream pdfStream = null;
 
-            foreach (Razo razo in razos)
+            foreach (ConTime.Screens.Razo razo in razos)
             {
-                razonete.AddRazonete(razo.TabelaRazonete());
-                pdfStream = razonete.PdfCreate();
+                // Obter o razonete com o cabeçalho atualizado dinamicamente
+                Classes.Razo classesRazo = razo.TabelaRazonete();
+
+                // Adicionar o razonete ao objeto "razonete"
+                razonete.AddRazonete(classesRazo);
             }
+
+            // Gerar o PDF
+            pdfStream = razonete.CreatePDF();
 
             if (pdfStream != null)
             {
                 OpenPdfForViewing(pdfStream);
             }
+            else
+            {
+                MessageBox.Show("Não há razonetes para gerar o PDF", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
             return pdfStream;
         }
 
+
+
+
         private void OpenPdfForViewing(MemoryStream pdfStream)
         {
-            string tempFilePath = Path.Combine(Path.GetTempPath(), "tempRazonetes.pdf");
-
-            File.WriteAllBytes(tempFilePath, pdfStream.ToArray());
-
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(tempFilePath)
+            try
             {
-                UseShellExecute = true
-            });
+                // Caminho do arquivo temporário
+                string tempFilePath = Path.Combine(Path.GetTempPath(), "tempRazonetes.pdf");
+
+                // Salvar o PDF no caminho temporário
+                File.WriteAllBytes(tempFilePath, pdfStream.ToArray());
+
+                // Abrir o PDF no visualizador padrão
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(tempFilePath)
+                {
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                // Exibe uma mensagem de erro, caso ocorra alguma exceção
+                MessageBox.Show($"Erro ao tentar abrir o PDF: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
+
 
         public bool PdfAberto()
         {
@@ -361,6 +386,12 @@ namespace ConTime.Screens
 
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
+                    if (razos.Count == 0)
+                    {
+                        MessageBox.Show("Não há razonetes para salvar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
                     string filePath = saveFileDialog.FileName;
 
                     try
@@ -396,12 +427,6 @@ namespace ConTime.Screens
 
                         using (StreamWriter sw = new StreamWriter(filePath, false, Encoding.UTF8))
                         {
-                            if (razos.Count == 0)
-                            {
-                                MessageBox.Show("Nenhum Razo criado para salvar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                                return;
-                            }
-
                             foreach (var razo in razos)
                             {
                                 string cabecalho = razo.SalvarHeader();
@@ -442,9 +467,6 @@ namespace ConTime.Screens
                 }
             }
         }
-
-
-
 
         private void ImportarRazos(string filePath)
         {
@@ -540,16 +562,7 @@ namespace ConTime.Screens
 
         private void btn_salvar_razo_Click(object sender, EventArgs e)
         {
-            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
-            {
-                saveFileDialog.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
-                saveFileDialog.Title = "Salvar Razonetes como CSV";
-
-                if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    SalvarRazonete();
-                }
-            }
+            SalvarRazonete();
         }
 
 

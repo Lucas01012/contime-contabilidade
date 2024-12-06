@@ -20,7 +20,6 @@ namespace ConTime.Screens
         public DataSet DS { get; private set; } = new DataSet();
         string tablename = "livro_diario";
 
-        // Construtor atualizado para aceitar um DataTable
         public LDia(DataTable dt = null)
         {
             InitializeComponent();
@@ -29,32 +28,25 @@ namespace ConTime.Screens
 
             if (dt != null)
             {
-                // Se o DataTable for fornecido, verifique se ele já pertence a outro DataSet
                 if (dt.DataSet != null)
                 {
-                    // Se o DataTable já pertence a outro DataSet, remova-o de lá
-                    dt.DataSet.Tables.Remove(dt); // Remove o DataTable do DataSet original
+                    dt.DataSet.Tables.Remove(dt); 
                 }
 
-                // Usa o DataTable passado como parâmetro
                 DT = dt;
 
-                // Verifica se já existe uma tabela no DataSet com o nome desejado
                 if (DS.Tables.Contains(tablename))
                 {
-                    // Limpa a tabela existente no DataSet
                     DS.Tables[tablename].Clear();
                 }
                 else
                 {
-                    // Se não existir, cria uma nova tabela
                     DT.TableName = tablename;
                     DS.Tables.Add(DT);
                 }
             }
             else
             {
-                // Caso contrário, cria um DataTable vazio
                 DT = DS.Tables.Add(tablename);
                 DT.Columns.Add("Data");
                 DT.Columns.Add("Código");
@@ -65,10 +57,8 @@ namespace ConTime.Screens
                 DT.Columns.Add("Saldo");
             }
 
-            // Atribui o DataTable ao DataGridView
             dgv.DataSource = DS.Tables[tablename];
 
-            // Configurações do DataGridView
             dgv.ReadOnly = true;
             dgv.AllowUserToAddRows = false;
             dgv.AllowUserToDeleteRows = false;
@@ -77,7 +67,11 @@ namespace ConTime.Screens
             dgv.Columns["Código"].Width = 65;
             dgv.Columns["Histórico"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
 
-            MudarCorDataGrid(); // Método adicional (não fornecido no código)
+            dgv.DefaultCellStyle.SelectionForeColor = Color.FromArgb(29, 61, 48);
+            dgv.DefaultCellStyle.SelectionBackColor = Color.White;
+            dgv.DefaultCellStyle.Font = new Font("Yu Gothic UI", 12, FontStyle.Bold);
+            dgv.ColumnHeadersDefaultCellStyle.Font = new Font("Yu Gothic UI", 12, FontStyle.Bold);
+
         }
 
         private void PassarDadosParaExer()
@@ -107,11 +101,11 @@ namespace ConTime.Screens
 
             string codigo = cb_cod.Text;
             string conta = tb_Conta.Text;
-            bool isCredito = rb_c.Checked; // Determina o tipo de registro
+            bool isCredito = rb_c.Checked;
 
-            // Verificar duplicidade com base no tipo (Crédito ou Débito)
             DataRow? registroExistente = DS.Tables[tablename].Rows
                 .Cast<DataRow>()
+                .Where(row => row.RowState != DataRowState.Deleted)
                 .FirstOrDefault(row =>
                     row["Código"].ToString() == codigo &&
                     row["Conta"].ToString() == conta &&
@@ -121,7 +115,6 @@ namespace ConTime.Screens
 
             if (registroExistente != null)
             {
-                // Exibir opções para o usuário
                 DialogResult resultado = MessageBox.Show(
                     $"Já existe um registro do tipo {(isCredito ? "Crédito" : "Débito")} para esta Conta e Código. Deseja:\n\n" +
                     "Sim: Substituir o registro existente\n" +
@@ -134,7 +127,7 @@ namespace ConTime.Screens
 
                 if (resultado == DialogResult.Cancel) return;
 
-                if (resultado == DialogResult.Yes) // Substituir
+                if (resultado == DialogResult.Yes)
                 {
                     AtualizarRegistro(registroExistente);
                     return;
@@ -144,6 +137,8 @@ namespace ConTime.Screens
             DS.Tables[tablename].AcceptChanges();
             InserirNovoRegistro();
         }
+
+
 
         private void InserirNovoRegistro()
         {
@@ -170,10 +165,11 @@ namespace ConTime.Screens
             }
 
             DS.Tables[tablename].Rows.Add(dr);
-            DS.Tables[tablename].AcceptChanges();  // Não esquecer de confirmar as mudanças
-            PassarDadosParaExer(); // Atualize o DataStore
+            DS.Tables[tablename].AcceptChanges(); // Confirmar as mudanças
+            PassarDadosParaExer();
             LimparCampos();
         }
+
         private void AtualizarRegistro(DataRow row)
         {
             decimal.TryParse(tb_valor.Text, out decimal valor);
@@ -182,22 +178,23 @@ namespace ConTime.Screens
             row["Data"] = dtp.Value;
             row["Histórico"] = tb_historico.Text;
 
-            if (rb_c.Checked) // Atualizar como Crédito
+            if (rb_c.Checked)
             {
                 row["Crédito"] = valor.ToString("F2");
                 row["Débito"] = "0.00";
                 row["Saldo"] = (saldo + valor).ToString("F2");
             }
-            else if (rb_d.Checked) // Atualizar como Débito
+            else if (rb_d.Checked)
             {
                 row["Débito"] = valor.ToString("F2");
                 row["Crédito"] = "0.00";
                 row["Saldo"] = (saldo - valor).ToString("F2");
             }
 
-            DS.Tables[tablename].AcceptChanges(); // Não esquecer de confirmar as mudanças
-            PassarDadosParaExer(); // Atualize o DataStore
+            DS.Tables[tablename].AcceptChanges(); // Confirmar as mudanças
+            PassarDadosParaExer();
         }
+
         private void LimparCampos()
         {
             tb_saldo.Clear();
@@ -218,31 +215,36 @@ namespace ConTime.Screens
 
         private void GerarPdf(object sender, EventArgs e)
         {
-            MemoryStream pdfStream = PdfGerar();  // Gere o PDF
+            MemoryStream pdfStream = PdfGerar();
 
             if (pdfStream != null)
             {
-                // Abre o PDF diretamente sem salvar em disco
                 OpenPdfForViewing(pdfStream);
             }
         }
 
         public MemoryStream PdfGerar()
         {
-            // Verifique se o DataTable existe e não é nulo
             if (DS.Tables.Contains(tablename) && DS.Tables[tablename] != null)
             {
-                // Passa o DataTable para a classe LDia
-                Classes.LDia ldia = new Classes.LDia(DS.Tables[tablename]);
-                return ldia.PdfCreate();  // Agora retorna o MemoryStream gerado
+                if (DS.Tables[tablename].Rows.Count > 0)
+                {
+                    Classes.LDia ldia = new Classes.LDia(DS.Tables[tablename]);
+                    return ldia.PdfCreate();
+                }
+                else
+                {
+                    MessageBox.Show("Não há dados para gerar o PDF do Livro Diário.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return null;
+                }
             }
             else
             {
-                // Exibe uma mensagem caso o DataTable não seja encontrado ou seja nulo
-                MessageBox.Show("Não há dados para gerar o PDF do Livro Diário.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return null; // Retorna null caso não haja dados
+                MessageBox.Show("Tabela não encontrada ou está nula.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
             }
         }
+
         private void OpenPdfForViewing(MemoryStream pdfStream)
         {
             string tempFilePath = Path.Combine(Path.GetTempPath(), "LivroDiario.pdf");
@@ -259,13 +261,12 @@ namespace ConTime.Screens
                     UseShellExecute = true
                 });
 
-                // Opcionalmente, excluir o arquivo temporário após o processo ser encerrado
                 process.Exited += (sender, args) =>
                 {
-                    File.Delete(tempFilePath); // Exclui o arquivo temporário após o processo ser fechado
+                    File.Delete(tempFilePath);
                 };
 
-                process.EnableRaisingEvents = true; // Permite que o evento Exited seja disparado
+                process.EnableRaisingEvents = true; 
             }
             catch (Exception ex)
             {
@@ -290,72 +291,52 @@ namespace ConTime.Screens
 
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    SalvarLDia();
+                    string filePath = saveFileDialog.FileName;
+                    SalvarLDia(filePath);
                 }
             }
-
         }
 
-        public void SalvarLDia()
+        public void SalvarLDia(string filePath)
         {
-            // Obtém os dados do DataStore
             DataTable ldiaData = DataStore.LdiaData;
 
-            // Verifica se há dados disponíveis
             if (ldiaData == null || ldiaData.Rows.Count == 0)
             {
                 MessageBox.Show("Não há dados no Livro Diário para salvar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            // Criar um SaveFileDialog para o usuário escolher o local e o nome do arquivo
-            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+            try
             {
-                saveFileDialog.Filter = "Arquivo CSV (*.csv)|*.csv";
-                saveFileDialog.Title = "Salvar Lançamentos do Dia";
-                saveFileDialog.DefaultExt = "csv";
-
-                // Verifica se o usuário selecionou um arquivo
-                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                using (StreamWriter writer = new StreamWriter(filePath))
                 {
-                    string filePath = saveFileDialog.FileName;
+                    // Escrever cabeçalho
+                    writer.WriteLine("Código,Data,Conta,Histórico,Débito,Crédito,Saldo");
 
-                    try
+                    // Escrever dados
+                    foreach (DataRow row in ldiaData.Rows)
                     {
-                        // Escreve os dados no arquivo CSV
-                        using (StreamWriter writer = new StreamWriter(filePath))
-                        {
-                            // Cabeçalho do CSV
-                            writer.WriteLine("Código,Data,Conta,Histórico,Débito,Crédito,Saldo");
+                        string codigo = row["Código"]?.ToString() ?? "";
+                        string data = row["Data"] != DBNull.Value ? Convert.ToDateTime(row["Data"]).ToString("dd/MM/yyyy") : "";
+                        string conta = row["Conta"]?.ToString() ?? "";
+                        string historico = row["Histórico"]?.ToString() ?? "";
+                        string debito = row["Débito"] != DBNull.Value ? Convert.ToDecimal(row["Débito"]).ToString("F2", CultureInfo.InvariantCulture) : "";
+                        string credito = row["Crédito"] != DBNull.Value ? Convert.ToDecimal(row["Crédito"]).ToString("F2", CultureInfo.InvariantCulture) : "";
+                        string saldo = row["Saldo"] != DBNull.Value ? Convert.ToDecimal(row["Saldo"]).ToString("F2", CultureInfo.InvariantCulture) : "";
 
-                            // Itera pelas linhas da tabela
-                            foreach (DataRow row in ldiaData.Rows)
-                            {
-                                // Obtém os valores de cada coluna
-                                string codigo = row["Código"]?.ToString() ?? "";
-                                string data = row["Data"] != DBNull.Value ? Convert.ToDateTime(row["Data"]).ToString("dd/MM/yyyy") : "";
-                                string conta = row["Conta"]?.ToString() ?? "";
-                                string historico = row["Histórico"]?.ToString() ?? "";
-                                string debito = row["Débito"] != DBNull.Value ? Convert.ToDecimal(row["Débito"]).ToString("F2", CultureInfo.InvariantCulture) : "";
-                                string credito = row["Crédito"] != DBNull.Value ? Convert.ToDecimal(row["Crédito"]).ToString("F2", CultureInfo.InvariantCulture) : "";
-                                string saldo = row["Saldo"] != DBNull.Value ? Convert.ToDecimal(row["Saldo"]).ToString("F2", CultureInfo.InvariantCulture) : "";
-
-                                // Escreve a linha no CSV
-                                writer.WriteLine($"{codigo},{data},{conta},{historico},{debito},{credito},{saldo}");
-                            }
-
-                            // Confirmação de sucesso
-                            MessageBox.Show("Lançamentos do Dia salvos com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        }
+                        writer.WriteLine($"{codigo},{data},{conta},{historico},{debito},{credito},{saldo}");
                     }
-                    catch (Exception ex)
-                    {
-                        // Trata erros durante o salvamento
-                        MessageBox.Show($"Erro ao exportar o arquivo CSV: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
+
+                    MessageBox.Show("Lançamentos do Dia salvos com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao exportar o arquivo CSV: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
+
 
 
 
@@ -378,22 +359,21 @@ namespace ConTime.Screens
             {
                 using (StreamReader reader = new StreamReader(filePath))
                 {
-                    string line = reader.ReadLine(); // Lê a linha do cabeçalho
+                    string line = reader.ReadLine();
 
-                    while ((line = reader.ReadLine()) != null) // Lê cada linha subsequente
+                    while ((line = reader.ReadLine()) != null) 
                     {
                         string[] data = line.Split(',');
 
-                        if (data.Length == 7) // Certifica-se de que todas as colunas estão presentes
+                        if (data.Length == 7) 
                         {
                             string codigo = data[0];
                             string conta = data[2];
 
-                            // Verifica se já existe uma linha com o mesmo Código e Conta
                             bool jaExiste = DS.Tables[tablename].AsEnumerable().Any(row =>
                                 row.Field<string>("Código") == codigo && row.Field<string>("Conta") == conta);
 
-                            if (!jaExiste) // Só adiciona se não existir
+                            if (!jaExiste)
                             {
                                 DataRow row = DS.Tables[tablename].NewRow();
 
@@ -405,7 +385,7 @@ namespace ConTime.Screens
                                 row["Crédito"] = string.IsNullOrEmpty(data[5]) ? (object)DBNull.Value : Convert.ToDecimal(data[5], CultureInfo.InvariantCulture);
                                 row["Saldo"] = string.IsNullOrEmpty(data[6]) ? (object)DBNull.Value : Convert.ToDecimal(data[6], CultureInfo.InvariantCulture);
 
-                                DS.Tables[tablename].Rows.Add(row); // Adiciona a nova linha
+                                DS.Tables[tablename].Rows.Add(row);
                             }
                         }
                         else
@@ -424,18 +404,6 @@ namespace ConTime.Screens
         }
 
 
-        private void MudarCorDataGrid()
-        {
-            dtp.BackColor = Color.FromArgb(185, 220, 201);
-            dtp.ForeColor = Color.Black;
-
-            dgv.BackgroundColor = Color.FromArgb(185, 220, 201);
-            dgv.DefaultCellStyle.BackColor = Color.FromArgb(185, 220, 201);
-            dgv.DefaultCellStyle.SelectionBackColor = Color.FromArgb(185, 220, 201);
-            dgv.DefaultCellStyle.Font = new Font("Yu Gothic UI", 12, FontStyle.Bold);
-
-            dgv.ColumnHeadersDefaultCellStyle.Font = new Font("Yu Gothic UI", 12, FontStyle.Bold);
-        }
         private void label4_Click(object sender, EventArgs e)
         {
 

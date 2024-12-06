@@ -32,7 +32,7 @@
             btnImportar = new Button();
             btn_salvar_dre = new Button();
             button7 = new Button();
-            button6 = new Button();
+            btnDeletar = new Button();
             panel10 = new Panel();
             r7 = new Label();
             label8 = new Label();
@@ -100,7 +100,7 @@
             panel1.Controls.Add(btnImportar);
             panel1.Controls.Add(btn_salvar_dre);
             panel1.Controls.Add(button7);
-            panel1.Controls.Add(button6);
+            panel1.Controls.Add(btnDeletar);
             panel1.Controls.Add(panel10);
             panel1.Controls.Add(panel8);
             panel1.Controls.Add(panel7);
@@ -155,18 +155,18 @@
             button7.UseVisualStyleBackColor = false;
             button7.Click += CreatePdf;
             // 
-            // button6
+            // btnDeletar
             // 
-            button6.BackColor = Color.FromArgb(185, 220, 201);
-            button6.Font = new Font("Yu Gothic UI", 9.75F, FontStyle.Bold);
-            button6.Location = new Point(200, 1);
-            button6.Margin = new Padding(4);
-            button6.Name = "button6";
-            button6.Size = new Size(85, 43);
-            button6.TabIndex = 8;
-            button6.Text = "Apagar";
-            button6.UseVisualStyleBackColor = false;
-            button6.Click += button6_Click;
+            btnDeletar.BackColor = Color.FromArgb(185, 220, 201);
+            btnDeletar.Font = new Font("Yu Gothic UI", 9.75F, FontStyle.Bold);
+            btnDeletar.Location = new Point(200, 1);
+            btnDeletar.Margin = new Padding(4);
+            btnDeletar.Name = "btnDeletar";
+            btnDeletar.Size = new Size(85, 43);
+            btnDeletar.TabIndex = 8;
+            btnDeletar.Text = "Apagar";
+            btnDeletar.UseVisualStyleBackColor = false;
+            btnDeletar.Click += button6_Click;
             // 
             // panel10
             // 
@@ -734,15 +734,8 @@
         #endregion
 
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Panel panel10;
-        private System.Windows.Forms.Label r7;
-        private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Panel panel8;
         private System.Windows.Forms.DataGridView ROutras;
-        private System.Windows.Forms.Panel panel15;
-        private System.Windows.Forms.Label r6;
-        private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Panel panel7;
         private System.Windows.Forms.Label r4;
         private System.Windows.Forms.Label label6;
@@ -758,9 +751,6 @@
         private System.Windows.Forms.Label r3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Panel panel4;
-        private System.Windows.Forms.Label r2;
-        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.DataGridView Imposto;
         private System.Windows.Forms.Panel panel12;
@@ -774,8 +764,18 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button7;
-        private System.Windows.Forms.Button button6;
+        private System.Windows.Forms.Button btnDeletar;
         private Button btn_salvar_dre;
         private Button btnImportar;
+        private Panel panel10;
+        private Label r7;
+        private Label label8;
+        private Panel panel15;
+        private Label r6;
+        private Label label7;
+        private Button button5;
+        private Panel panel4;
+        private Label r2;
+        private Label label3;
     }
 }

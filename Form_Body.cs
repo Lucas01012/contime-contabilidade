@@ -210,7 +210,7 @@ namespace ConTime
 
         private void button1_Click(object sender, EventArgs e)
         {
-            PlanoCon sv_PlanoCon = new();
+            PlanoCon sv_PlanoCon = PlanoCon.GetInstance();
             sv_PlanoCon.Show();
         }
 

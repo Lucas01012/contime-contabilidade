@@ -34,8 +34,8 @@ namespace ConTime.Screens
         {
             InitializeComponent();
 
-            DataGridView[] TablesInterface = [RBruta, Imposto, Custos, Despesas, ROutras];
-            lbl = [r0, r1, r2, r3, r4, r5, r6, r7];
+            DataGridView[] TablesInterface = { RBruta, Imposto, Custos, Despesas, ROutras };
+            lbl = new Label[] { r0, r1, r2, r3, r4, r5, r6, r7 };
 
             panel1.HorizontalScroll.Maximum = 0;
             panel1.AutoScroll = true;
@@ -48,14 +48,16 @@ namespace ConTime.Screens
                 TablesInterface[i].DataSource = DS.Tables[Tables[i]];
                 TablesInterface[i].Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                 TablesInterface[i].ScrollBars = ScrollBars.Vertical;
+                TablesInterface[i].CellValueChanged += ContentUpdate;
+                TablesInterface[i].DefaultCellStyle.SelectionBackColor = Color.White;
+                TablesInterface[i].DefaultCellStyle.SelectionForeColor = Color.FromArgb(29, 61, 48);
+                TablesInterface[i].Font = new Font("Yu Gothic UI", 12, FontStyle.Bold);
+
+                // TablesInterface[i].UserAddedRow += ContentUpdate; // Capturar quando uma nova linha é adicionada
+                //TablesInterface[i].RowsRemoved += ContentUpdate;  // Capturar quando uma linha é removida
             }
 
             panel10.Parent = panel1;
-        }
-
-        private void painel_Leave(object sender, EventArgs e)
-        {
-            EnviarDreParaDataStore();
         }
 
         private void TableSetup(string name)
@@ -65,54 +67,40 @@ namespace ConTime.Screens
             dt.Columns.Add("Valor");
         }
 
+        private void painel_Leave(object sender, EventArgs e)
+        {
+            EnviarDreParaDataStore();
+        }
+
         private void EnviarDreParaDataStore()
         {
-            // Limpa os dados existentes na DRE antes de adicionar novos
-            foreach (var painel in DataStore.DrePanéisData.Values)
-            {
-                painel.Clear();  // Limpa os dados de cada painel
-            }
+            DataStore.LimparDreData(); 
 
-            foreach (Control control in this.Controls)
+            DataGridView[] TablesInterface = { RBruta, Imposto, Custos, Despesas, ROutras };
+
+            foreach (var dgv in TablesInterface)
             {
-                if (control is Panel painel)
+                foreach (DataGridViewRow row in dgv.Rows)
                 {
-                    foreach (Control subControl in painel.Controls)
+                    if (row.Cells["Receita"].Value != null && row.Cells["Valor"].Value != null)
                     {
-                        if (subControl is TextBox txt)
-                        {
-                            string receita = txt.Name.Replace(painel.Name, "").Trim();
-                            string valor = txt.Text;
-
-                            // Adiciona os dados ao painel correspondente no DataStore
-                            DataStore.AdicionarDreData(painel.Name, receita, valor);
-                        }
-                        else if (subControl is Label lbl)
-                        {
-                            string receita = lbl.Name.Replace(painel.Name, "").Trim();
-                            string valor = lbl.Text;
-
-                            // Adiciona os dados ao painel correspondente no DataStore
-                            DataStore.AdicionarDreData(painel.Name, receita, valor);
-                        }
+                        string receita = row.Cells["Receita"].Value.ToString();
+                        string valor = row.Cells["Valor"].Value.ToString();
+                        DataStore.AdicionarDreData(dgv.Name, receita, valor);
                     }
                 }
             }
 
-            // Chama para adicionar os resultados calculados após o preenchimento dos dados da DRE
             AdicionarResultadosCalculados();
         }
 
 
         private void AdicionarResultadosCalculados()
         {
-            // Adiciona os resultados calculados nos painéis da DRE
             for (int i = 0; i < resul.Length; i++)
             {
                 string resultadoConta = $"Resultado {i + 1}";
                 string resultadoValor = resul[i].ToString("C", CultureInfo.CurrentCulture);
-
-                // Adiciona o resultado ao painel "Resultado de Lucro do Exercício"
                 DataStore.AdicionarDreData("Resultado de Lucro do Exercício", resultadoConta, resultadoValor);
             }
         }
@@ -184,11 +172,11 @@ namespace ConTime.Screens
 
             if (totalHeight > this.Height)
             {
-                panel1.VerticalScroll.Visible = true; // Habilita o scroll
+                panel1.VerticalScroll.Visible = true;
             }
             else
             {
-                panel1.VerticalScroll.Visible = false; // Desabilita o scroll
+                panel1.VerticalScroll.Visible = false;
             }
         }
     
@@ -236,8 +224,55 @@ namespace ConTime.Screens
 
         private void button6_Click(object sender, EventArgs e)
         {
-
+            LimparDados();
         }
+        private void LimparDados()
+        {
+            DataGridView[] TablesInterface = { RBruta, Imposto, Custos, Despesas, ROutras };
+            bool dadosRemovidos = false;
+
+            foreach (var dgv in TablesInterface)
+            {
+                for (int i = dgv.Rows.Count - 1; i >= 0; i--)
+                {
+                    bool isEmpty = true;
+                    foreach (DataGridViewCell cell in dgv.Rows[i].Cells)
+                    {
+                        if (cell.Value != null && !string.IsNullOrWhiteSpace(cell.Value.ToString()))
+                        {
+                            isEmpty = false;
+                            break;
+                        }
+                    }
+                    if (!isEmpty)
+                    {
+                        dgv.Rows.RemoveAt(i);
+                        dadosRemovidos = true;
+                    }
+                }
+            }
+
+            if (dadosRemovidos)
+            {
+                Array.Clear(resul, 0, resul.Length);
+
+                for (int i = 0; i < lbl.Length; i++)
+                {
+                    lbl[i].Text = $"{resul[i]:C}";
+                }
+
+                DataStore.LimparDreData();
+
+                panel1.Refresh();
+                MessageBox.Show("Todos os dados foram limpos.", "Limpeza Concluída", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show("Não há dados para excluir.", "Nenhum Dado", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+
 
         private void CreatePdf(object sender, EventArgs e)
         {
@@ -246,7 +281,14 @@ namespace ConTime.Screens
 
         public MemoryStream GerarPdf()
         {
-            Classes.Dre dre = new(DS, resul[2], resul[4], resul[7]);
+            // Verificar se há dados nas tabelas necessárias
+            if (DS == null || DS.Tables.Count == 0 || !HasData(DS))
+            {
+                MessageBox.Show("Não há dados suficientes para gerar o PDF.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
+            }
+
+            Classes.Dre dre = new Classes.Dre(DS, resul[2], resul[4], resul[7]);
 
             try
             {
@@ -266,7 +308,27 @@ namespace ConTime.Screens
                 MessageBox.Show($"Erro ao gerar o PDF: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return null;
             }
-            EnviarDreParaDataStore();
+        }
+
+        private bool HasData(DataSet dataSet)
+        {
+            foreach (DataTable table in dataSet.Tables)
+            {
+                if (table.Rows.Count > 0)
+                {
+                    foreach (DataRow row in table.Rows)
+                    {
+                        foreach (var item in row.ItemArray)
+                        {
+                            if (item != null && !string.IsNullOrWhiteSpace(item.ToString()))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
         }
 
 
@@ -302,14 +364,7 @@ namespace ConTime.Screens
 
         private void btn_salvar_dre_Click(object sender, EventArgs e)
         {
-            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
-            {
-                saveFileDialog.Filter = "Arquivo CSV (*.csv)|*.csv";
-                if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    SalvarDre();
-                }
-            }
+            SalvarDre();
         }
 
         public void SalvarDre()
@@ -368,20 +423,103 @@ namespace ConTime.Screens
             }
         }
 
-        private void ImportarDre(string filePath)
+        public void ImportarDreDoConteudo(string csvContent)
         {
             try
             {
-                using (StreamReader reader = new StreamReader(filePath))
+                using (StringReader reader = new StringReader(csvContent))
                 {
                     string line;
                     string currentTable = string.Empty;
+                    bool isValidFormat = false;
 
                     while ((line = reader.ReadLine()) != null)
                     {
                         if (line.StartsWith("Tabela:"))
                         {
                             currentTable = line.Replace("Tabela: ", "").Trim();
+                            isValidFormat = true;
+                        }
+                        else if (!string.IsNullOrEmpty(currentTable) && line.Contains(","))
+                        {
+                            string[] values = line.Split(',');
+
+                            if (values.Length == 2)
+                            {
+                                if (!DS.Tables.Contains(currentTable))
+                                {
+                                    DS.Tables.Add(currentTable);
+                                    DataTable dt = DS.Tables[currentTable];
+                                    dt.Columns.Add("Receita");
+                                    dt.Columns.Add("Valor");
+                                }
+
+                                DataRow row = DS.Tables[currentTable].NewRow();
+                                row["Receita"] = values[0].Trim();
+                                row["Valor"] = values[1].Trim();
+                                DS.Tables[currentTable].Rows.Add(row);
+                            }
+                            else
+                            {
+                                string controlName = values[0].Trim();
+                                string controlValue = values[1].Trim();
+
+                                foreach (Control ctrl in this.Controls)
+                                {
+                                    if (ctrl.Name == controlName)
+                                    {
+                                        if (ctrl is TextBox)
+                                        {
+                                            ((TextBox)ctrl).Text = controlValue;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (!isValidFormat)
+                    {
+                        throw new FormatException("O conteúdo CSV não está no formato correto para a DRE.");
+                    }
+
+                    AtualizarPaineis();
+                    AtualizarResultados();
+
+                    MessageBox.Show("Dados importados com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (FormatException ex)
+            {
+                MessageBox.Show(ex.Message, "Erro de Formato", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao importar o conteúdo CSV: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void ImportarDre(string filePath)
+        {
+            try
+            {
+                if (!filePath.EndsWith(".csv", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new ArgumentException("O arquivo selecionado não é um CSV válido.");
+                }
+
+                using (StreamReader reader = new StreamReader(filePath))
+                {
+                    string line;
+                    string currentTable = string.Empty;
+                    bool isValidFormat = false;
+
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        if (line.StartsWith("Tabela:"))
+                        {
+                            currentTable = line.Replace("Tabela: ", "").Trim();
+                            isValidFormat = true;
                         }
                         else if (!string.IsNullOrEmpty(currentTable) && line.Contains(","))
                         {
@@ -415,78 +553,79 @@ namespace ConTime.Screens
                                         {
                                             ((TextBox)ctrl).Text = controlValue;
                                         }
-                                     
                                     }
                                 }
                             }
                         }
                     }
 
-                    AtualizarPainéis();
+                    if (!isValidFormat)
+                    {
+                        throw new FormatException("O arquivo CSV não está no formato correto para a DRE.");
+                    }
 
+                    AtualizarPaineis();
                     AtualizarResultados();
 
                     MessageBox.Show("Dados importados com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
+            }
+            catch (ArgumentException ex)
+            {
+                MessageBox.Show(ex.Message, "Erro de Arquivo", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (FormatException ex)
+            {
+                MessageBox.Show(ex.Message, "Erro de Formato", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Erro ao importar o arquivo CSV: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        private void AtualizarPainéis()
+
+
+        private void AtualizarPaineis()
         {
-            foreach (string tableName in Tables)
+            DataGridView[] TablesInterface = { RBruta, Imposto, Custos, Despesas, ROutras };
+
+            foreach (var dgv in TablesInterface)
             {
-                DataTable dt = DS.Tables[tableName];
-                DataGridView dgv = null;
-
-                switch (tableName)
+                string tableName = dgv.Name;
+                if (DS.Tables.Contains(tableName))
                 {
-                    case "RBruta":
-                        dgv = RBruta;
-                        break;
-                    case "Imposto":
-                        dgv = Imposto;
-                        break;
-                    case "Custos":
-                        dgv = Custos;
-                        break;
-                    case "Despesas":
-                        dgv = Despesas;
-                        break;
-                    case "OutrasR":
-                        dgv = ROutras;
-                        break;
-                }
-
-                if (dgv != null)
-                {
-                    if (dt.Rows.Count > 0)
-                    {
-                        dgv.Rows.Clear();
-                    }
-
-                    foreach (DataRow row in dt.Rows)
-                    {
-                        dgv.Rows.Add(row["Receita"], row["Valor"]);
-                    }
-
-                    AtualizarResultados();
+                    dgv.DataSource = DS.Tables[tableName];
                 }
             }
         }
 
+
         private void AtualizarResultados()
         {
+            DataGridView[] TablesInterface = { RBruta, Imposto, Custos, Despesas, ROutras };
+
+            foreach (var dgv in TablesInterface)
+            {
+                foreach (DataGridViewRow row in dgv.Rows)
+                {
+                    if (row.Cells["Valor"].Value != null && float.TryParse(row.Cells["Valor"].Value.ToString(), out float valor))
+                    {
+                        int index = Array.IndexOf(TablesInterface, dgv);
+                        resul[index] += valor;
+                    }
+                }
+            }
+
             resul[2] = resul[0] - resul[1];
             resul[4] = resul[2] - resul[3];
             resul[7] = resul[4] - resul[5] + resul[6];
 
-            lbl[4].Text = $"{resul[2]:C}";
-            lbl[5].Text = $"{resul[3]:C}";
-            lbl[7].Text = $"{resul[7]:C}";
+            for (int i = 0; i < lbl.Length; i++)
+            {
+                lbl[i].Text = $"{resul[i]:C}";
+            }
         }
+
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
 

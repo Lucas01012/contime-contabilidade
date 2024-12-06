@@ -34,7 +34,6 @@
             btn_salvar_bpat = new Button();
             button3 = new Button();
             button2 = new Button();
-            btn_delete = new Button();
             splitContainer1 = new SplitContainer();
             splitContainer3 = new SplitContainer();
             splitContainer4 = new SplitContainer();
@@ -127,7 +126,6 @@
             panel1.Controls.Add(btn_salvar_bpat);
             panel1.Controls.Add(button3);
             panel1.Controls.Add(button2);
-            panel1.Controls.Add(btn_delete);
             panel1.Dock = DockStyle.Top;
             panel1.Location = new Point(0, 0);
             panel1.Margin = new Padding(3, 2, 3, 2);
@@ -153,7 +151,7 @@
             // 
             button1.BackColor = Color.FromArgb(185, 220, 201);
             button1.Font = new Font("Yu Gothic UI", 9.75F, FontStyle.Bold);
-            button1.Location = new Point(1009, 0);
+            button1.Location = new Point(537, -1);
             button1.Name = "button1";
             button1.Size = new Size(71, 27);
             button1.TabIndex = 40;
@@ -190,26 +188,13 @@
             // 
             button2.BackColor = Color.FromArgb(185, 220, 201);
             button2.Font = new Font("Yu Gothic UI", 9.75F, FontStyle.Bold);
-            button2.Location = new Point(244, 0);
+            button2.Location = new Point(179, 0);
             button2.Name = "button2";
             button2.Size = new Size(71, 27);
             button2.TabIndex = 37;
             button2.Text = "Importar";
             button2.UseVisualStyleBackColor = false;
             button2.Click += button2_Click;
-            // 
-            // btn_delete
-            // 
-            btn_delete.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            btn_delete.BackColor = Color.FromArgb(185, 220, 201);
-            btn_delete.Font = new Font("Yu Gothic UI", 9.75F, FontStyle.Bold);
-            btn_delete.Location = new Point(120, 0);
-            btn_delete.Margin = new Padding(3, 2, 3, 2);
-            btn_delete.Name = "btn_delete";
-            btn_delete.Size = new Size(66, 27);
-            btn_delete.TabIndex = 24;
-            btn_delete.Text = "Apagar";
-            btn_delete.UseVisualStyleBackColor = false;
             // 
             // splitContainer1
             // 
@@ -811,21 +796,20 @@
         private Panel panel5;
         private Panel panel7;
         private Panel panel10;
-        private DataGridView AtvNCirculante;
         private Panel panel8;
-        private DataGridView PsvCirculante;
         private Panel panel9;
-        private DataGridView PsvNCirculante;
         private Panel panel11;
-        private DataGridView Patrimonio;
         private Label lbl_TAtivos;
         private Label lbl_TPassivos;
-        private Button btn_delete;
         private Button button3;
         private Button button2;
         private Button button1;
         private Button btn_salvar_bpat;
         private TextBox tb_Header;
         private DataGridView AtvCirculante;
+        private DataGridView AtvNCirculante;
+        private DataGridView PsvCirculante;
+        private DataGridView PsvNCirculante;
+        private DataGridView Patrimonio;
     }
 }
