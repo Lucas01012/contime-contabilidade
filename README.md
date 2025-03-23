@@ -23,7 +23,7 @@ Screenshots
 Veja abaixo algumas telas do Contime:
 
 Plano de Contas:
-(https://github.com/Lucas01012/contime-contabilidade/blob/master/Plano%20de%20Contas.png)
+[https://github.com/Lucas01012/contime-contabilidade/blob/master/Plano%20de%20Contas.png] 
 Razonete:
 (https://github.com/Lucas01012/contime-contabilidade/blob/master/Razonete.png)
 Demonstração do Resultado do Exercício (DRE):
